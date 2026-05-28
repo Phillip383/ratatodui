@@ -29,3 +29,13 @@ pub mod connection {
         Ok(())
     }
 }
+
+pub mod crud {
+    pub fn create() {}
+
+    pub fn read() {}
+
+    pub fn update() {}
+
+    pub fn delete() {}
+}

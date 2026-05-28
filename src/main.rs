@@ -1,5 +1,7 @@
 mod db_service;
 
+use db_service::connection;
+
 fn main() {
-    let _ = db_service::connection::connect();
+    let _ = connection::connect();
 }
