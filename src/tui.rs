@@ -1,18 +1,22 @@
+use color_eyre::eyre::{ErrReport, Result};
 use ratatui::layout::Direction::{Horizontal, Vertical};
-use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
-use ratatui::style::{Style, Stylize};
-use ratatui::widgets::calendar::{CalendarEventStore, Monthly};
-use ratatui::widgets::{
-    Block, BorderType, Borders, List, Padding, Paragraph, Scrollbar, ScrollbarOrientation,
-    ScrollbarState, Table, Tabs,
-};
+use ratatui::layout::{Alignment, Constraint, Layout};
+use ratatui::style::Style;
+use ratatui::widgets::{Block, Borders, Padding, Paragraph};
 use ratatui::{DefaultTerminal, Frame};
 
-pub fn run(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
+use tui_input::{Input, backend::crossterm::EventHandler};
+use tui_textarea::{Key, TextArea};
+
+use crate::state::{self, StateContext};
+
+pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
+    let mut state_context = StateContext::new();
+
     loop {
         terminal.draw(render)?;
-        if crossterm::event::read()?.is_key_press() {
-            //TODO: Add Input handling in module
+        //TODO: This will change, for now it quits if some is returned.
+        if state_context.handle_events()?.is_some() {
             break Ok(());
         }
     }
@@ -51,7 +55,7 @@ fn render(frame: &mut Frame) {
         .split(editor_inner);
 
     frame.render_widget(editor_block, bg_layout[1]);
-    frame.render_widget(Paragraph::new("Title"), editor_layout[0]);
+    frame.render_widget(Paragraph::new("title"), editor_layout[0]);
     frame.render_widget(Paragraph::new("Description"), editor_layout[1]);
     frame.render_widget(Paragraph::new("[S]ave [C]ancel"), editor_layout[2]);
 
