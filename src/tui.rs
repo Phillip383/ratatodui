@@ -23,6 +23,11 @@ pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
 }
 
 fn render(frame: &mut Frame) {
+    let vim_command_layout = Layout::default()
+        .direction(Vertical)
+        .constraints(vec![Constraint::Min(0), Constraint::Length(1)])
+        .split(frame.area());
+
     let bg_layout = Layout::default()
         .direction(Horizontal)
         .constraints(vec![
@@ -30,7 +35,7 @@ fn render(frame: &mut Frame) {
             Constraint::Percentage(60),
             Constraint::Percentage(20),
         ])
-        .split(frame.area());
+        .split(vim_command_layout[0]);
 
     let lh_side_layout = Layout::default()
         .direction(Vertical)
@@ -64,6 +69,8 @@ fn render(frame: &mut Frame) {
 
     frame.render_widget(border_box("Calender"), rh_side_layout[0]);
     frame.render_widget(border_box("Events"), rh_side_layout[1]);
+
+    frame.render_widget(Paragraph::new("Vim Status Bar"), vim_command_layout[1]);
 }
 
 fn border_box(title: &'static str) -> Block<'static> {

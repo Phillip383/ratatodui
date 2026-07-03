@@ -3,8 +3,8 @@ pub mod insert;
 pub mod normal;
 pub mod visual;
 
-use color_eyre::eyre::{ErrReport, Result, anyhow};
-use crossterm::event::{self, Event, KeyCode, KeyEventKind};
+use color_eyre::eyre::{ErrReport, Result};
+use crossterm::event::{self, Event, KeyCode};
 
 use crate::state::Transition::{ChangeState, Command};
 
