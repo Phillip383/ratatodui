@@ -1,7 +1,14 @@
 mod db_service;
+mod todo_service;
+mod tui;
 
+use color_eyre::eyre::{Ok, Result};
 use db_service::connection;
 
-fn main() {
+fn main() -> Result<()> {
+    color_eyre::install()?;
     let _ = connection::connect();
+    ratatui::run(tui::run)?;
+    ratatui::restore();
+    Ok(())
 }
