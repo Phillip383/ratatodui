@@ -38,7 +38,22 @@ fn render(frame: &mut Frame) {
         .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(bg_layout[2]);
 
-    frame.render_widget(border_box(("Ratatodui")), bg_layout[1]);
+    let editor_block = border_box("Ratatodui");
+    let editor_inner = editor_block.inner(bg_layout[1]);
+
+    let editor_layout = Layout::default()
+        .direction(Vertical)
+        .constraints(vec![
+            Constraint::Length(2),
+            Constraint::Min(0),
+            Constraint::Length(2),
+        ])
+        .split(editor_inner);
+
+    frame.render_widget(editor_block, bg_layout[1]);
+    frame.render_widget(Paragraph::new("Title"), editor_layout[0]);
+    frame.render_widget(Paragraph::new("Description"), editor_layout[1]);
+    frame.render_widget(Paragraph::new("[S]ave [C]ancel"), editor_layout[2]);
 
     frame.render_widget(border_box("Todos"), lh_side_layout[0]);
     frame.render_widget(border_box("Lists"), lh_side_layout[1]);
@@ -55,5 +70,5 @@ fn border_box(title: &'static str) -> Block<'static> {
         .border_style(Style::new().red())
         .border_type(ratatui::widgets::BorderType::Rounded)
         .merge_borders(ratatui::symbols::merge::MergeStrategy::Exact)
-        .padding(Padding::uniform(2))
+        .padding(Padding::uniform(1))
 }
