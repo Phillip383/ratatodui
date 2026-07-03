@@ -1,3 +1,4 @@
+use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::style::{Style, Stylize};
 use ratatui::widgets::calendar::{CalendarEventStore, Monthly};
@@ -18,16 +19,37 @@ pub fn run(terminal: &mut DefaultTerminal) -> std::io::Result<()> {
 }
 
 fn render(frame: &mut Frame) {
-    let main_layout = Layout::horizontal([Constraint::Percentage(25), Constraint::Fill(1)]);
-    let left_layout = Layout::vertical([Constraint::Percentage(60), Constraint::Fill(1)]);
-    let right_layout = Layout::vertical([Constraint::Percentage(95), Constraint::Fill(1)]);
+    let bg_layout = Layout::default()
+        .direction(Horizontal)
+        .constraints(vec![
+            Constraint::Percentage(20),
+            Constraint::Percentage(60),
+            Constraint::Percentage(20),
+        ])
+        .split(frame.area());
 
-    frame.render_widget(background(), frame.area());
+    let lh_side_layout = Layout::default()
+        .direction(Vertical)
+        .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(bg_layout[0]);
+
+    let rh_side_layout = Layout::default()
+        .direction(Vertical)
+        .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(bg_layout[2]);
+
+    frame.render_widget(border_box(("Ratatodui")), bg_layout[1]);
+
+    frame.render_widget(border_box("Todos"), lh_side_layout[0]);
+    frame.render_widget(border_box("Lists"), lh_side_layout[1]);
+
+    frame.render_widget(border_box("Calender"), rh_side_layout[0]);
+    frame.render_widget(border_box("Events"), rh_side_layout[1]);
 }
 
-fn background() -> Block<'static> {
+fn border_box(title: &'static str) -> Block<'static> {
     Block::new()
-        .title("Ratatodui")
+        .title(title)
         .title_alignment(Alignment::Center)
         .borders(Borders::ALL)
         .border_style(Style::new().red())
