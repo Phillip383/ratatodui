@@ -33,6 +33,12 @@ impl StateContext {
     /// TODO: This will become more robust.
     pub fn handle_events(&mut self) -> Result<Option<()>, ErrReport> {
         if let Event::Key(key) = event::read()? {
+            //Handle escape, every state goes back to normal mode via escape.
+            if key.code == KeyCode::Esc {
+                self.current_mode = Box::new(normal::NormalMode);
+                return Ok(None);
+            }
+
             if let Some(k) = key.code.as_char() {
                 let transition = self.current_mode.handle_input(k);
                 match transition {
