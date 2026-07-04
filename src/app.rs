@@ -1,9 +1,3 @@
-pub struct TodoList {
-    items: Vec<String>,
-    selected_index: usize, // UI state lives HERE, not in a global context
-    pub is_active: bool,
-}
-
 pub struct App {
     //FIXME: These will change to the correct types.
     todos: String,

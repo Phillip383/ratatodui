@@ -58,12 +58,15 @@ pub fn render(frame: &mut Frame, app: &app::App) {
         ])
         .split(editor_inner);
 
+    let mut todos = todos::TodoList::new();
+
     frame.render_widget(editor_block, bg_layout[1]);
     frame.render_widget(Paragraph::new("title"), editor_layout[0]);
     frame.render_widget(Paragraph::new("Description"), editor_layout[1]);
     frame.render_widget(Paragraph::new("[S]ave [C]ancel"), editor_layout[2]);
 
-    frame.render_widget(border_box("Todos"), lh_side_layout[0]);
+    todos.render(frame, lh_side_layout[0], app);
+
     frame.render_widget(border_box("Lists"), lh_side_layout[1]);
 
     frame.render_widget(border_box("Calender"), rh_side_layout[0]);
