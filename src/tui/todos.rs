@@ -10,7 +10,7 @@ use ratatui::{
 
 pub struct TodoList {
     items: Vec<String>,
-    selected_index: usize, // UI state lives HERE, not in a global context
+    selected_index: usize,
     pub is_active: bool,
 }
 
@@ -37,17 +37,6 @@ impl Component for TodoList {
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
         // Draw the list using self.items and self.selected_index
-        frame.render_widget(border_box("Todos"), area);
+        frame.render_widget(super::border_box("Todos"), area);
     }
-}
-
-fn border_box(title: &'static str) -> Block<'static> {
-    Block::new()
-        .title(title)
-        .title_alignment(Alignment::Center)
-        .borders(Borders::ALL)
-        .border_style(Style::new().red())
-        .border_type(ratatui::widgets::BorderType::Rounded)
-        .merge_borders(ratatui::symbols::merge::MergeStrategy::Exact)
-        .padding(Padding::uniform(1))
 }

@@ -1,3 +1,5 @@
+use crate::state::StateContext;
+
 pub struct App {
     //FIXME: These will change to the correct types.
     todos: String,
@@ -7,6 +9,7 @@ pub struct App {
     active_list_item: String,
     active_event: String,
     editor_buffer: String,
+    pub state_context: StateContext,
 }
 
 impl App {
@@ -19,6 +22,7 @@ impl App {
             active_list_item: String::from(""),
             active_event: String::from(""),
             editor_buffer: String::from(""),
+            state_context: StateContext::new(),
         }
     }
 }

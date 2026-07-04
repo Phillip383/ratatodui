@@ -9,7 +9,6 @@ use db_service::connection;
 use ratatui::DefaultTerminal;
 
 use app::App;
-use state::StateContext;
 
 fn main() -> Result<(), ErrReport> {
     color_eyre::install()?;
@@ -21,14 +20,12 @@ fn main() -> Result<(), ErrReport> {
 }
 
 pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
-    let mut state_context = StateContext::new();
-
-    let app = App::new();
+    let mut app = App::new();
 
     loop {
         terminal.draw(|frame| tui::render(frame, &app))?;
         //TODO: This will change, for now it quits if some is returned.
-        if state_context.handle_events()?.is_some() {
+        if app.state_context.handle_events()?.is_some() {
             break Ok(());
         }
     }
