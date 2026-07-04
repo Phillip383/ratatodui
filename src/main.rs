@@ -1,3 +1,4 @@
+mod app;
 mod db_service;
 mod state;
 mod todo_service;
@@ -9,7 +10,7 @@ use db_service::connection;
 fn main() -> Result<(), ErrReport> {
     color_eyre::install()?;
     let _ = connection::connect();
-    ratatui::run(tui::run)?;
+    ratatui::run(app::run)?;
     ratatui::restore();
     Ok(())
 }

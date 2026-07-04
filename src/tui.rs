@@ -1,28 +1,25 @@
-use color_eyre::eyre::{ErrReport, Result};
+mod calendar;
+mod calendar_events;
+mod editor;
+mod todo_lists;
+mod todos;
+mod vim_status_bar;
+
+use color_eyre::Result;
+use crossterm::event::Event;
+use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
-use ratatui::layout::{Alignment, Constraint, Layout};
+use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::Style;
 use ratatui::widgets::{Block, Borders, Padding, Paragraph};
-use ratatui::{DefaultTerminal, Frame};
 
-use tui_input::{Input, backend::crossterm::EventHandler};
-use tui_textarea::{Key, TextArea};
+pub trait Component {
+    fn handle_event(&mut self, event: &Event) -> Result<Option<()>>;
 
-use crate::state::{self, StateContext};
-
-pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
-    let mut state_context = StateContext::new();
-
-    loop {
-        terminal.draw(render)?;
-        //TODO: This will change, for now it quits if some is returned.
-        if state_context.handle_events()?.is_some() {
-            break Ok(());
-        }
-    }
+    fn render(&mut self, frame: &mut Frame, area: Rect);
 }
 
-fn render(frame: &mut Frame) {
+pub fn render(frame: &mut Frame) {
     let vim_command_layout = Layout::default()
         .direction(Vertical)
         .constraints(vec![Constraint::Min(0), Constraint::Length(1)])
