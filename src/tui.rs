@@ -13,13 +13,15 @@ use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::Style;
 use ratatui::widgets::{Block, Borders, Padding, Paragraph};
 
+use crate::app;
+
 pub trait Component {
     fn handle_event(&mut self, event: &Event) -> Result<Option<()>>;
 
-    fn render(&mut self, frame: &mut Frame, area: Rect);
+    fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App);
 }
 
-pub fn render(frame: &mut Frame) {
+pub fn render(frame: &mut Frame, app: &app::App) {
     let vim_command_layout = Layout::default()
         .direction(Vertical)
         .constraints(vec![Constraint::Min(0), Constraint::Length(1)])

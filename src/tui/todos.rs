@@ -1,13 +1,7 @@
-use super::Component;
+use super::{Component, app, app::TodoList};
 use color_eyre::Result;
 use crossterm::event::Event;
 use ratatui::{Frame, layout::Rect};
-
-pub struct TodoList {
-    items: Vec<String>,
-    selected_index: usize, // UI state lives HERE, not in a global context
-    is_active: bool,
-}
 
 impl Component for TodoList {
     fn handle_event(&mut self, event: &Event) -> Result<Option<()>> {
@@ -19,7 +13,7 @@ impl Component for TodoList {
         Ok(None)
     }
 
-    fn render(&mut self, frame: &mut Frame, area: Rect) {
+    fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
         // Draw the list using self.items and self.selected_index
     }
 }
