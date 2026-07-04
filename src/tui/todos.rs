@@ -1,17 +1,12 @@
 use super::{Component, app};
 use color_eyre::Result;
 use crossterm::event::Event;
-use ratatui::{
-    Frame,
-    layout::{Alignment, Rect},
-    style::Style,
-    widgets::{Block, Borders, Padding},
-};
+use ratatui::{Frame, layout::Rect};
 
 pub struct TodoList {
     items: Vec<String>,
     selected_index: usize,
-    pub is_active: bool,
+    is_active: bool,
 }
 
 impl TodoList {
