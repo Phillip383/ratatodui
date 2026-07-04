@@ -48,11 +48,11 @@ pub fn render(frame: &mut Frame, app: &app::App) {
 
     let mut editor = editor::Editor::new();
     let mut todos = todos::TodoList::new();
+    let mut lists = todo_lists::TodoLists::new();
 
     editor.render(frame, bg_layout[1], app);
     todos.render(frame, lh_side_layout[0], app);
-
-    frame.render_widget(border_box("Lists"), lh_side_layout[1]);
+    lists.render(frame, lh_side_layout[1], app);
 
     frame.render_widget(border_box("Calender"), rh_side_layout[0]);
     frame.render_widget(border_box("Events"), rh_side_layout[1]);
