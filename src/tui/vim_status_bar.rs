@@ -4,7 +4,8 @@ use crossterm::event::Event;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction::Horizontal, Layout, Rect},
-    widgets::Paragraph,
+    style::Style,
+    widgets::{Block, Borders, Padding, Paragraph},
 };
 
 pub struct VimStatusBar {
@@ -34,10 +35,13 @@ impl Component for VimStatusBar {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
+        let container = Block::new().padding(Padding::horizontal(1));
+        let container_inner = container.inner(area);
+
         let lo = Layout::default()
             .direction(Horizontal)
-            .constraints([Constraint::Length(2), Constraint::Min(0)])
-            .split(area);
+            .constraints([Constraint::Percentage(10), Constraint::Min(0)])
+            .split(container_inner);
 
         self.state = match &app.state_context.current_mode {
             crate::state::VimState::Normal(mode) => "NORMAL".to_string(),
@@ -46,6 +50,8 @@ impl Component for VimStatusBar {
             crate::state::VimState::Visual(mode) => "VISUAL".to_string(),
         };
 
-        frame.render_widget(Paragraph::new(self.state.as_str()), area);
+        frame.render_widget(container, area);
+        frame.render_widget(Paragraph::new(self.state.as_str()), lo[0]);
+        frame.render_widget(Paragraph::new("..."), lo[1]);
     }
 }

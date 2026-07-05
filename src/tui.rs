@@ -29,22 +29,13 @@ pub fn render(frame: &mut Frame, app: &app::App) {
 
     let bg_layout = Layout::default()
         .direction(Horizontal)
-        .constraints(vec![
-            Constraint::Percentage(20),
-            Constraint::Percentage(80),
-            //Constraint::Percentage(20),
-        ])
+        .constraints(vec![Constraint::Percentage(20), Constraint::Percentage(80)])
         .split(vim_command_layout[0]);
 
     let lh_side_layout = Layout::default()
         .direction(Vertical)
         .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(bg_layout[0]);
-
-    // let rh_side_layout = Layout::default()
-    //     .direction(Vertical)
-    //     .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
-    //     .split(bg_layout[2]);
 
     let mut editor = editor::Editor::new();
     let mut todos = todos::TodoList::new();
@@ -54,10 +45,6 @@ pub fn render(frame: &mut Frame, app: &app::App) {
     editor.render(frame, bg_layout[1], app);
     todos.render(frame, lh_side_layout[0], app);
     lists.render(frame, lh_side_layout[1], app);
-
-    // frame.render_widget(border_box("Calender"), rh_side_layout[0]);
-    // frame.render_widget(border_box("Events"), rh_side_layout[1]);
-
     status_bar.render(frame, vim_command_layout[1], app);
 }
 
