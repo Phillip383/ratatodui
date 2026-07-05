@@ -11,9 +11,27 @@ use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::Style;
-use ratatui::widgets::{Block, Borders, Padding, Paragraph};
+use ratatui::widgets::{Block, Borders, Padding};
 
 use crate::app;
+
+pub struct TUI {
+    editor: editor::Editor,
+    todos: todos::TodoList,
+    lists: todo_lists::TodoLists,
+    status_bar: vim_status_bar::VimStatusBar,
+}
+
+impl TUI {
+    pub fn new() -> Self {
+        TUI {
+            editor: editor::Editor::new(),
+            todos: todos::TodoList::new(),
+            lists: todo_lists::TodoLists::new(),
+            status_bar: vim_status_bar::VimStatusBar::new(),
+        }
+    }
+}
 
 pub trait Component {
     fn handle_event(&mut self, event: &Event) -> Result<Option<()>>;
@@ -21,7 +39,7 @@ pub trait Component {
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App);
 }
 
-pub fn render(frame: &mut Frame, app: &app::App) {
+pub fn render(frame: &mut Frame, tui: &mut TUI, app: &app::App) {
     let vim_command_layout = Layout::default()
         .direction(Vertical)
         .constraints(vec![Constraint::Min(0), Constraint::Length(1)])
@@ -37,15 +55,10 @@ pub fn render(frame: &mut Frame, app: &app::App) {
         .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(bg_layout[0]);
 
-    let mut editor = editor::Editor::new();
-    let mut todos = todos::TodoList::new();
-    let mut lists = todo_lists::TodoLists::new();
-    let mut status_bar = vim_status_bar::VimStatusBar::new();
-
-    editor.render(frame, bg_layout[1], app);
-    todos.render(frame, lh_side_layout[0], app);
-    lists.render(frame, lh_side_layout[1], app);
-    status_bar.render(frame, vim_command_layout[1], app);
+    tui.editor.render(frame, bg_layout[1], app);
+    tui.todos.render(frame, lh_side_layout[0], app);
+    tui.lists.render(frame, lh_side_layout[1], app);
+    tui.status_bar.render(frame, vim_command_layout[1], app);
 }
 
 fn border_box(title: &'static str) -> Block<'static> {

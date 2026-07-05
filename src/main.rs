@@ -21,9 +21,10 @@ fn main() -> Result<(), ErrReport> {
 
 pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
     let mut app = App::new();
+    let mut tui = tui::TUI::new();
 
     loop {
-        terminal.draw(|frame| tui::render(frame, &app))?;
+        terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
         //TODO: This will change, for now it quits if some is returned.
         if app.state_context.handle_events()?.is_some() {
             break Ok(());
