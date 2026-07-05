@@ -5,10 +5,11 @@ pub mod visual;
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
+use std::any::Any;
 
 use crate::state::Transition::{ChangeState, Command};
 
-pub trait State {
+pub trait State: Any {
     fn handle_input(&self, input: char) -> Transition;
 }
 
@@ -19,7 +20,7 @@ pub enum Transition {
 }
 
 pub struct StateContext {
-    current_mode: Box<dyn State>,
+    pub current_mode: Box<dyn State>,
 }
 
 impl StateContext {

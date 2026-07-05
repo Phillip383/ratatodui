@@ -49,6 +49,7 @@ pub fn render(frame: &mut Frame, app: &app::App) {
     let mut editor = editor::Editor::new();
     let mut todos = todos::TodoList::new();
     let mut lists = todo_lists::TodoLists::new();
+    let mut status_bar = vim_status_bar::VimStatusBar::new();
 
     editor.render(frame, bg_layout[1], app);
     todos.render(frame, lh_side_layout[0], app);
@@ -57,7 +58,7 @@ pub fn render(frame: &mut Frame, app: &app::App) {
     frame.render_widget(border_box("Calender"), rh_side_layout[0]);
     frame.render_widget(border_box("Events"), rh_side_layout[1]);
 
-    frame.render_widget(Paragraph::new("Vim Status Bar"), vim_command_layout[1]);
+    status_bar.render(frame, vim_command_layout[1], app);
 }
 
 fn border_box(title: &'static str) -> Block<'static> {

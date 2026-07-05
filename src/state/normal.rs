@@ -1,6 +1,5 @@
-use crate::state::{command, insert, visual};
-
 use super::{State, Transition};
+use crate::state::{command, insert, visual};
 
 pub struct NormalMode;
 

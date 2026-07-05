@@ -1,5 +1,4 @@
 use super::{State, Transition};
-
 pub struct VisualMode;
 
 impl State for VisualMode {
