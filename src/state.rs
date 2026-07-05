@@ -5,28 +5,37 @@ pub mod visual;
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
-use std::any::Any;
 
-use crate::state::Transition::{ChangeState, Command};
+use crate::state::{
+    Transition::{ChangeState, Command},
+    VimState::{Normal, Visual},
+};
 
-pub trait State: Any {
+pub trait State {
     fn handle_input(&self, input: char) -> Transition;
+}
+
+pub enum VimState {
+    Normal(normal::NormalMode),
+    Visual(visual::VisualMode),
+    Command(command::CommandMode),
+    Insert(insert::InsertMode),
 }
 
 pub enum Transition {
     Stay,
-    ChangeState(Box<dyn State>),
+    ChangeState(VimState),
     Command(String),
 }
 
 pub struct StateContext {
-    pub current_mode: Box<dyn State>,
+    pub current_mode: VimState,
 }
 
 impl StateContext {
     pub fn new() -> Self {
         Self {
-            current_mode: Box::new(normal::NormalMode),
+            current_mode: VimState::Normal(normal::NormalMode),
         }
     }
 
@@ -36,12 +45,18 @@ impl StateContext {
         if let Event::Key(key) = event::read()? {
             //Handle escape, every state goes back to normal mode via escape.
             if key.code == KeyCode::Esc {
-                self.current_mode = Box::new(normal::NormalMode);
+                self.current_mode = VimState::Normal(normal::NormalMode);
                 return Ok(None);
             }
 
             if let Some(k) = key.code.as_char() {
-                let transition = self.current_mode.handle_input(k);
+                let transition = match &self.current_mode {
+                    Normal(mode) => mode.handle_input(k),
+                    Visual(mode) => mode.handle_input(k),
+                    VimState::Command(mode) => mode.handle_input(k),
+                    VimState::Insert(mode) => mode.handle_input(k),
+                };
+
                 match transition {
                     ChangeState(new_state) => self.current_mode = new_state,
                     Command(cmd) => {

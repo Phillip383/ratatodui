@@ -1,5 +1,3 @@
-use crate::state::{State, command::CommandMode, normal::NormalMode, visual::VisualMode};
-
 use super::{Component, app};
 use color_eyre::Result;
 use crossterm::event::Event;
@@ -41,13 +39,12 @@ impl Component for VimStatusBar {
             .constraints([Constraint::Length(2), Constraint::Min(0)])
             .split(area);
 
-        //FIXME: This is very bad and verbose, if its bad here, it'll be bad later, changing it now.
-        // if let Some(current_state) = &app
-        //     .state_context
-        //     .current_mode
-        //     .as_any()
-        //     .downcast_ref::<NormalMode>()
-        // {}
+        self.state = match &app.state_context.current_mode {
+            crate::state::VimState::Normal(mode) => "NORMAL".to_string(),
+            crate::state::VimState::Command(mode) => "COMMAND".to_string(),
+            crate::state::VimState::Insert(mode) => "INSERT".to_string(),
+            crate::state::VimState::Visual(mode) => "VISUAL".to_string(),
+        };
 
         frame.render_widget(Paragraph::new(self.state.as_str()), area);
     }
