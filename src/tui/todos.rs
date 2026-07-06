@@ -32,6 +32,9 @@ impl Component for TodoList {
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
         // Draw the list using self.items and self.selected_index
-        frame.render_widget(super::border_box("Todos"), area);
+        frame.render_widget(
+            super::border_box("Todos", Some("[C]reate [D]elete [E]dit")),
+            area,
+        );
     }
 }

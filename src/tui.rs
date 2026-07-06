@@ -10,7 +10,7 @@ use crossterm::event::Event;
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
-use ratatui::style::Style;
+use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, Borders, Padding};
 
 use crate::app;
@@ -61,10 +61,14 @@ pub fn render(frame: &mut Frame, tui: &mut TUI, app: &app::App) {
     tui.status_bar.render(frame, vim_command_layout[1], app);
 }
 
-fn border_box(title: &'static str) -> Block<'static> {
+fn border_box(title: &'static str, bottom_title: Option<&'static str>) -> Block<'static> {
+    let bottom_title = bottom_title.unwrap_or_default();
+
     Block::new()
-        .title(title)
-        .title_alignment(Alignment::Center)
+        .title_top(title)
+        .title_alignment(Alignment::Left)
+        .title_bottom(bottom_title)
+        .title_style(Color::LightYellow)
         .borders(Borders::ALL)
         .border_style(Style::new().red())
         .border_type(ratatui::widgets::BorderType::Rounded)

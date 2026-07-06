@@ -39,23 +39,21 @@ impl Component for Editor {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        let editor_block = super::border_box("Ratatodui");
+        let editor_block = super::border_box("Ratatodui", None);
         let editor_inner = editor_block.inner(area);
 
         let editor_layout = Layout::default()
             .direction(Vertical)
-            .constraints(vec![
-                Constraint::Length(2),
-                Constraint::Min(0),
-                Constraint::Length(2),
-            ])
+            .constraints(vec![Constraint::Length(2), Constraint::Min(0)])
             .split(editor_inner);
 
         frame.render_widget(editor_block, area);
         frame.render_widget(Paragraph::new(self.title.as_str()), editor_layout[0]);
         frame.render_widget(Paragraph::new(self.description.as_str()), editor_layout[1]);
-        frame.render_widget(Paragraph::new("[S]ave [C]ancel"), editor_layout[2]);
 
-        frame.render_widget(super::border_box("Ratatodui"), area);
+        frame.render_widget(
+            super::border_box("Ratatodui", Some("[S]ave [C]ancel")),
+            area,
+        );
     }
 }
