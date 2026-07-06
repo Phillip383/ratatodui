@@ -1,12 +1,11 @@
-use color_eyre::Result;
-use crossterm::event::Event;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction::Vertical, Layout, Rect},
+    style::Color,
     widgets::Paragraph,
 };
 
-use crate::app;
+use crate::{app, state::ActiveWidget};
 
 use super::Component;
 
@@ -14,7 +13,7 @@ pub struct Editor {
     title: String,
     date: String,
     description: String,
-    is_active: bool,
+    color: Color,
 }
 
 impl Editor {
@@ -23,23 +22,23 @@ impl Editor {
             title: "Title".to_string(),
             date: "01/19/1993".to_string(),
             description: "Todo description text goes here.".to_string(),
-            is_active: false,
+            color: Color::Red,
         }
     }
 }
 
 impl Component for Editor {
-    fn handle_event(&mut self, event: &Event) -> Result<Option<()>> {
-        // Only react to j/k if this component is active
-        if !self.is_active {
-            return Ok(None);
-        }
-        // ... handle vim motions to update self.selected_index ...
-        Ok(None)
+    fn handle_active_state(&mut self, active_widget: &crate::state::ActiveWidget) {
+        match active_widget {
+            ActiveWidget::Editor => self.color = Color::Blue,
+            _ => self.color = Color::Red,
+        };
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        let editor_block = super::border_box("Ratatodui", None);
+        self.handle_active_state(&app.state_context.active_widget);
+
+        let editor_block = super::border_box(self.color, "Ratatodui", Some("[S]ave [C]ancel"));
         let editor_inner = editor_block.inner(area);
 
         let editor_layout = Layout::default()
@@ -55,9 +54,6 @@ impl Component for Editor {
         frame.render_widget(Paragraph::new(todo_title), editor_layout[0]);
         frame.render_widget(Paragraph::new(todo_desc), editor_layout[1]);
 
-        frame.render_widget(
-            super::border_box("Ratatodui", Some("[S]ave [C]ancel")),
-            area,
-        );
+        frame.render_widget(editor_block, area);
     }
 }

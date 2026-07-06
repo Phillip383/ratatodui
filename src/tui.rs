@@ -1,23 +1,22 @@
-mod editor;
-mod todo_lists;
-mod todos;
-mod vim_status_bar;
+pub mod editor;
+pub mod todo_lists;
+pub mod todos;
+pub mod vim_status_bar;
 
-use color_eyre::Result;
-use crossterm::event::Event;
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
-use ratatui::style::{Color, Style};
+use ratatui::style::Color;
 use ratatui::widgets::{Block, Borders, Padding};
 
 use crate::app;
+use crate::state::ActiveWidget::{self};
 
 pub struct TUI {
-    editor: editor::Editor,
-    todos: todos::TodoList,
-    lists: todo_lists::TodoLists,
-    status_bar: vim_status_bar::VimStatusBar,
+    pub editor: editor::Editor,
+    pub todos: todos::TodoList,
+    pub lists: todo_lists::TodoLists,
+    pub status_bar: vim_status_bar::VimStatusBar,
 }
 
 impl TUI {
@@ -32,7 +31,7 @@ impl TUI {
 }
 
 pub trait Component {
-    fn handle_event(&mut self, event: &Event) -> Result<Option<()>>;
+    fn handle_active_state(&mut self, active_widget: &ActiveWidget);
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App);
 }
@@ -59,7 +58,11 @@ pub fn render(frame: &mut Frame, tui: &mut TUI, app: &app::App) {
     tui.status_bar.render(frame, vim_command_layout[1], app);
 }
 
-fn border_box(title: &'static str, bottom_title: Option<&'static str>) -> Block<'static> {
+fn border_box(
+    color: Color,
+    title: &'static str,
+    bottom_title: Option<&'static str>,
+) -> Block<'static> {
     let bottom_title = bottom_title.unwrap_or_default();
 
     Block::new()
@@ -68,7 +71,7 @@ fn border_box(title: &'static str, bottom_title: Option<&'static str>) -> Block<
         .title_bottom(bottom_title)
         .title_style(Color::LightYellow)
         .borders(Borders::ALL)
-        .border_style(Style::new().red())
+        .border_style(color)
         .border_type(ratatui::widgets::BorderType::Rounded)
         .merge_borders(ratatui::symbols::merge::MergeStrategy::Exact)
         .padding(Padding::uniform(1))

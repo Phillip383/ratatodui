@@ -1,16 +1,17 @@
+use crate::state::ActiveWidget;
+
 use super::{Component, app};
-use color_eyre::Result;
-use crossterm::event::Event;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction::Horizontal, Layout, Rect},
+    style::Color,
     widgets::{Block, Padding, Paragraph},
 };
 
 pub struct VimStatusBar {
     state: String,
     command: String,
-    is_active: bool,
+    color: Color,
 }
 
 impl VimStatusBar {
@@ -18,22 +19,22 @@ impl VimStatusBar {
         VimStatusBar {
             state: "NORMAL".to_string(),
             command: "".to_string(),
-            is_active: false,
+            color: Color::Red,
         }
     }
 }
 
 impl Component for VimStatusBar {
-    fn handle_event(&mut self, event: &Event) -> Result<Option<()>> {
-        // Only react to j/k if this component is active
-        if !self.is_active {
-            return Ok(None);
-        }
-        // ... handle vim motions to update self.selected_index ...
-        Ok(None)
+    fn handle_active_state(&mut self, active_widget: &crate::state::ActiveWidget) {
+        match active_widget {
+            ActiveWidget::StatusBar => self.color = Color::Blue,
+            _ => self.color = Color::Red,
+        };
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
+        self.handle_active_state(&app.state_context.active_widget);
+
         let container = Block::new().padding(Padding::horizontal(1));
         let container_inner = container.inner(area);
 

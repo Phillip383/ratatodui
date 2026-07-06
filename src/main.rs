@@ -16,8 +16,9 @@ fn main() -> Result<(), ErrReport> {
 }
 
 pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
-    let mut app = App::new();
     let mut tui = tui::TUI::new();
+    let state_context = state::StateContext::new();
+    let mut app = App::new(state_context);
 
     loop {
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
