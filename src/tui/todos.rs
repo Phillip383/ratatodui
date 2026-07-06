@@ -1,11 +1,7 @@
 use super::{Component, app};
 use color_eyre::Result;
 use crossterm::event::Event;
-use ratatui::{
-    Frame,
-    layout::{Direction::Vertical, Layout, Rect},
-    widgets::{List, Paragraph},
-};
+use ratatui::{Frame, layout::Rect, widgets::List};
 
 pub struct TodoList {
     items: Vec<String>,

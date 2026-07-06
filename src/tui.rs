@@ -1,5 +1,3 @@
-mod calendar;
-mod calendar_events;
 mod editor;
 mod todo_lists;
 mod todos;

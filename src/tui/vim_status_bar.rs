@@ -4,8 +4,7 @@ use crossterm::event::Event;
 use ratatui::{
     Frame,
     layout::{Constraint, Direction::Horizontal, Layout, Rect},
-    style::Style,
-    widgets::{Block, Borders, Padding, Paragraph},
+    widgets::{Block, Padding, Paragraph},
 };
 
 pub struct VimStatusBar {
