@@ -44,16 +44,14 @@ impl Component for Editor {
 
         let editor_layout = Layout::default()
             .direction(Vertical)
-            .constraints(vec![Constraint::Length(2), Constraint::Min(0)])
+            .constraints([Constraint::Length(2), Constraint::Min(0)])
             .split(editor_inner);
 
         let active_todo = &app.lists[app.active_list_item].todos[app.active_todo];
 
-        let empty = "".to_string();
         let todo_title = active_todo.title.as_str();
-        let todo_desc = active_todo.description.as_ref().unwrap_or(&empty).as_str();
+        let todo_desc = active_todo.description.as_deref().unwrap_or("");
 
-        frame.render_widget(editor_block, area);
         frame.render_widget(Paragraph::new(todo_title), editor_layout[0]);
         frame.render_widget(Paragraph::new(todo_desc), editor_layout[1]);
 
