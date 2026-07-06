@@ -1,7 +1,7 @@
 use super::{Component, app};
 use color_eyre::Result;
 use crossterm::event::Event;
-use ratatui::{Frame, layout::Rect};
+use ratatui::{Frame, layout::Rect, widgets::List};
 
 pub struct TodoLists {
     is_active: bool,
@@ -30,7 +30,13 @@ impl Component for TodoLists {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        // Draw the list using self.items and self.selected_index
+        let list_container = super::border_box("Lists", Some("[C]reate [D]elete [S]elect"));
+        let list_inner = list_container.inner(area);
+
+        let list = List::new(&app.lists);
+
+        frame.render_widget(list, list_inner);
+
         frame.render_widget(
             super::border_box("Lists", Some("[C]reate [D]elete [S]elect")),
             area,

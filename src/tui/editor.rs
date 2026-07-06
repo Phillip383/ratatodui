@@ -47,9 +47,15 @@ impl Component for Editor {
             .constraints(vec![Constraint::Length(2), Constraint::Min(0)])
             .split(editor_inner);
 
+        let active_todo = &app.lists[app.active_list_item].todos[app.active_todo];
+
+        let empty = "".to_string();
+        let todo_title = active_todo.title.as_str();
+        let todo_desc = active_todo.description.as_ref().unwrap_or(&empty).as_str();
+
         frame.render_widget(editor_block, area);
-        frame.render_widget(Paragraph::new(self.title.as_str()), editor_layout[0]);
-        frame.render_widget(Paragraph::new(self.description.as_str()), editor_layout[1]);
+        frame.render_widget(Paragraph::new(todo_title), editor_layout[0]);
+        frame.render_widget(Paragraph::new(todo_desc), editor_layout[1]);
 
         frame.render_widget(
             super::border_box("Ratatodui", Some("[S]ave [C]ancel")),
