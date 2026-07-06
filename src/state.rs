@@ -29,6 +29,7 @@ pub enum Transition {
     Command(String),
 }
 
+#[derive(PartialEq, Eq)]
 pub enum ActiveWidget {
     Todos,
     Lists,
