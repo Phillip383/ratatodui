@@ -35,6 +35,8 @@ pub enum ActiveWidget {
     Lists,
     Editor,
     StatusBar,
+    EditorTodoName,
+    EditorTodoDesc,
 }
 
 pub struct StateContext {

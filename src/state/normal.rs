@@ -1,5 +1,13 @@
 use super::{State, Transition, VimState};
-use crate::state::{ActiveWidget, command, insert, visual};
+use crate::state::{
+    ActiveWidget::{self, Editor, Lists, Todos},
+    insert, visual,
+};
+
+enum Direction {
+    UP,
+    DOWN,
+}
 
 pub struct NormalMode;
 
@@ -12,9 +20,20 @@ impl State for NormalMode {
             'L' => return Transition::ChangeFocus(ActiveWidget::Lists, None),
             'T' => return Transition::ChangeFocus(ActiveWidget::Todos, None),
             'E' => return Transition::ChangeFocus(ActiveWidget::Editor, None),
+            'J' => handle_vertical_focus(Direction::DOWN, active_widget),
+            'K' => handle_vertical_focus(Direction::UP, active_widget),
             _ => (),
         }
 
         Transition::Stay
+    }
+}
+
+fn handle_vertical_focus(direction: Direction, active_widget: &ActiveWidget) {
+    match active_widget {
+        Todos => (),
+        Editor => (),
+        Lists => (),
+        _ => (),
     }
 }

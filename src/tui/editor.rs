@@ -2,28 +2,21 @@ use ratatui::{
     Frame,
     layout::{Constraint, Direction::Vertical, Layout, Rect},
     style::Color,
-    widgets::Paragraph,
+    widgets::{Block, BorderType, Borders, Padding, Paragraph},
 };
+use tui_textarea::TextArea;
 
 use crate::{app, state::ActiveWidget};
 
 use super::Component;
 
 pub struct Editor {
-    title: String,
-    date: String,
-    description: String,
     color: Color,
 }
 
 impl Editor {
     pub fn new() -> Self {
-        Editor {
-            title: "Title".to_string(),
-            date: "01/19/1993".to_string(),
-            description: "Todo description text goes here.".to_string(),
-            color: Color::Red,
-        }
+        Editor { color: Color::Red }
     }
 }
 
@@ -43,17 +36,41 @@ impl Component for Editor {
 
         let editor_layout = Layout::default()
             .direction(Vertical)
-            .constraints([Constraint::Length(2), Constraint::Min(0)])
+            .constraints([Constraint::Length(3), Constraint::Min(0)])
             .split(editor_inner);
 
         let active_todo = &app.lists[app.active_list_item].todos[app.active_todo];
-
         let todo_title = active_todo.title.as_str();
         let todo_desc = active_todo.description.as_deref().unwrap_or("");
 
-        frame.render_widget(Paragraph::new(todo_title), editor_layout[0]);
-        frame.render_widget(Paragraph::new(todo_desc), editor_layout[1]);
+        let mut title = TextArea::default();
+        title.set_placeholder_text("Name");
+        title.set_block(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Color::Red)
+                .border_type(BorderType::Rounded),
+        );
 
+        let mut desc = TextArea::default();
+        desc.set_placeholder_text("description...");
+        desc.set_block(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Color::Red)
+                .padding(Padding::uniform(1))
+                .border_type(BorderType::Rounded),
+        );
+
+        let text_title: Vec<String> = todo_title.split("\n").map(String::from).collect();
+        title.set_lines(text_title, (0, 0));
+
+        let text_desc: Vec<String> = todo_desc.split("\n").map(String::from).collect();
+        desc.set_lines(text_desc, (0, 0));
+
+        frame.render_widget(&title, editor_layout[0]);
+
+        frame.render_widget(&desc, editor_layout[1]);
         frame.render_widget(editor_block, area);
     }
 }

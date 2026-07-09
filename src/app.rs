@@ -2,10 +2,10 @@ use ratatui::widgets::ListItem;
 
 use crate::{
     app::AppAction::{
-        UpdateActiveList, UpdateActiveTodo, UpdateListTitle, UpdateTodoDate, UpdateTodoDescription,
-        UpdateTodoTitle,
+        Backspace, InsertChar, Quit, UpdateActiveList, UpdateActiveTodo, UpdateListTitle,
+        UpdateTodoDate, UpdateTodoDescription, UpdateTodoTitle,
     },
-    state::StateContext,
+    state::{ActiveWidget, StateContext},
 };
 
 pub struct Todo {
@@ -43,6 +43,9 @@ enum AppAction {
     UpdateActiveList(usize),
     UpdateListTitle(String),
     UpdateActiveTodo(usize),
+    InsertChar(char),
+    Backspace,
+    Quit,
 }
 
 pub struct App {
@@ -91,6 +94,18 @@ impl App {
             UpdateActiveList(index) => self.active_list_item = index,
             UpdateListTitle(title) => active_list.title = title,
             UpdateActiveTodo(index) => self.active_todo = index,
+            InsertChar(c) => self.handle_char_input(c),
+            Backspace => (),
+            Quit => (),
+        }
+    }
+
+    fn handle_char_input(&mut self, c: char) {
+        //TODO: Inject into the currently focused widgets state.
+        match self.state_context.active_widget {
+            ActiveWidget::EditorTodoName => (),
+            ActiveWidget::EditorTodoDesc => (),
+            _ => (),
         }
     }
 }

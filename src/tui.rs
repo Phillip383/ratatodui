@@ -1,3 +1,4 @@
+pub mod edit_text;
 pub mod editor;
 pub mod todo_lists;
 pub mod todos;
