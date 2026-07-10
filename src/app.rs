@@ -2,7 +2,6 @@ use ratatui::widgets::ListItem;
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
-use tui_textarea::CursorMove::Back;
 
 use crate::state::{
     State,
@@ -91,34 +90,31 @@ impl App {
                 return Ok(None);
             }
 
-            if let Some(k) = key.code.as_char() {
-                let transition: Transition;
-                if k == ':' {
-                    transition = Transition::ChangeFocus(
-                        ActiveWidget::StatusBar,
-                        Some(VimState::Command(command::CommandMode)),
-                    )
-                } else {
-                    transition = match &self.current_mode {
-                        Normal(mode) => mode.handle_input(k, &self.active_widget),
-                        Visual(mode) => mode.handle_input(k, &self.active_widget),
-                        VimState::Command(mode) => mode.handle_input(k, &self.active_widget),
-                        VimState::Insert(mode) => mode.handle_input(k, &self.active_widget),
+            let transition: Transition = match key.code {
+                KeyCode::Char(':') => Transition::ChangeFocus(
+                    ActiveWidget::StatusBar,
+                    Some(VimState::Command(command::CommandMode)),
+                ),
+
+                _ => match &self.current_mode {
+                    Normal(mode) => mode.handle_input(key.code, &self.active_widget),
+                    Visual(mode) => mode.handle_input(key.code, &self.active_widget),
+                    VimState::Command(mode) => mode.handle_input(key.code, &self.active_widget),
+                    VimState::Insert(mode) => mode.handle_input(key.code, &self.active_widget),
+                },
+            };
+
+            //TODO: Handle app actions
+            match transition {
+                ChangeState(new_state) => self.current_mode = new_state,
+                ChangeFocus(widget, mode) => {
+                    self.active_widget = widget;
+                    if let Some(m) = mode {
+                        self.current_mode = m;
                     };
                 }
-
-                //TODO: Handle app actions
-                match transition {
-                    ChangeState(new_state) => self.current_mode = new_state,
-                    ChangeFocus(widget, mode) => {
-                        self.active_widget = widget;
-                        if let Some(m) = mode {
-                            self.current_mode = m;
-                        };
-                    }
-                    Action(action) => self.handle_action(action),
-                    _ => (),
-                }
+                Action(action) => self.handle_action(action),
+                _ => (),
             }
         }
         Ok(None)

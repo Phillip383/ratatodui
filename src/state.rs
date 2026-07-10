@@ -3,13 +3,15 @@ pub mod insert;
 pub mod normal;
 pub mod visual;
 
+use crossterm::event::KeyCode;
+
 use crate::types::{
     ActiveWidget::{self},
     AppAction::{self},
 };
 
 pub trait State {
-    fn handle_input(&self, input: char, active_widget: &ActiveWidget) -> Transition;
+    fn handle_input(&self, input: KeyCode, active_widget: &ActiveWidget) -> Transition;
 }
 
 pub enum VimState {

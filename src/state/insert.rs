@@ -4,21 +4,23 @@ use crate::types::{
 };
 
 use super::{ActiveWidget, State, Transition};
+use crossterm::event::KeyCode;
 
 pub struct InsertMode;
 
 impl State for InsertMode {
-    fn handle_input(&self, _input: char, _active_widget: &ActiveWidget) -> Transition {
+    fn handle_input(&self, _input: KeyCode, _active_widget: &ActiveWidget) -> Transition {
         //TODO: Flesh this out...
-
-        if _input == '\x08' {
+        if _input == KeyCode::Backspace {
             return Transition::Action(AppAction::Backspace);
-        }
-
-        match _active_widget {
-            EditorTodoDesc => return Transition::Action(AppAction::InsertChar(_input)),
-            EditorTodoName => return Transition::Action(AppAction::InsertChar(_input)),
-            _ => (),
+        } else {
+            if let Some(c) = _input.as_char() {
+                match _active_widget {
+                    EditorTodoDesc => return Transition::Action(AppAction::InsertChar(c)),
+                    EditorTodoName => return Transition::Action(AppAction::InsertChar(c)),
+                    _ => (),
+                }
+            }
         }
 
         Transition::Stay
