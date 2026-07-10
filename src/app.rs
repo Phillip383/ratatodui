@@ -2,6 +2,7 @@ use ratatui::widgets::ListItem;
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
+use tui_textarea::CursorMove::Back;
 
 use crate::state::{
     State,
@@ -136,7 +137,19 @@ impl App {
                     .push(c),
                 _ => (),
             },
-            Backspace => (),
+            Backspace => match self.active_widget {
+                EditorTodoName => {
+                    self.lists[self.active_list_item].todos[self.active_todo]
+                        .title
+                        .pop();
+                }
+                EditorTodoDesc => {
+                    self.lists[self.active_list_item].todos[self.active_todo]
+                        .description
+                        .pop();
+                }
+                _ => (),
+            },
             Quit => self.b_quit = true,
         }
     }
