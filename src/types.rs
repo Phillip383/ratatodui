@@ -15,11 +15,7 @@ pub enum ActiveWidget {
 }
 
 pub enum AppAction {
-    UpdateTodoTitle(String),
-    UpdateTodoDescription(String),
-    UpdateTodoDate(String),
     UpdateActiveList(usize),
-    UpdateListTitle(String),
     UpdateActiveTodo(usize),
     InsertChar(char),
     Backspace,

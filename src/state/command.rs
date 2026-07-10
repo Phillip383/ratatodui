@@ -1,7 +1,7 @@
 use super::{State, Transition};
 use crate::types::{
     ActiveWidget,
-    AppAction::{self, Quit},
+    AppAction::{self},
 };
 
 pub struct CommandMode;
