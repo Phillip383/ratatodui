@@ -2,11 +2,12 @@ use ratatui::{
     Frame,
     layout::{Constraint, Direction::Vertical, Layout, Rect},
     style::Color,
-    widgets::{Block, BorderType, Borders, Padding, Paragraph},
+    widgets::{Block, BorderType, Borders, Padding},
 };
 use tui_textarea::TextArea;
 
-use crate::{app, state::ActiveWidget};
+use crate::app;
+use crate::types::ActiveWidget;
 
 use super::Component;
 
@@ -21,9 +22,9 @@ impl Editor {
 }
 
 impl Component for Editor {
-    fn handle_active_state(&mut self, active_widget: &crate::state::ActiveWidget) {
+    fn handle_active_state(&mut self, active_widget: &ActiveWidget) {
         match active_widget {
-            ActiveWidget::Editor => self.color = Color::Blue,
+            ActiveWidget::Editor(None) => self.color = Color::Blue,
             _ => self.color = Color::Red,
         };
     }
@@ -39,7 +40,8 @@ impl Component for Editor {
             .constraints([Constraint::Length(3), Constraint::Min(0)])
             .split(editor_inner);
 
-        let active_todo = &app.lists[app.active_list_item].todos[app.active_todo];
+        let active_todo =
+            &app.lists[app.state_context.active_list_item].todos[app.state_context.active_todo];
         let todo_title = active_todo.title.as_str();
         let todo_desc = active_todo.description.as_deref().unwrap_or("");
 

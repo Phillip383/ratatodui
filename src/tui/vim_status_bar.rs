@@ -1,4 +1,4 @@
-use crate::state::ActiveWidget;
+use crate::types::ActiveWidget;
 
 use super::{Component, app};
 use ratatui::{
@@ -10,7 +10,6 @@ use ratatui::{
 
 pub struct VimStatusBar {
     state: String,
-    command: String,
     color: Color,
 }
 
@@ -18,14 +17,13 @@ impl VimStatusBar {
     pub fn new() -> Self {
         VimStatusBar {
             state: "NORMAL".to_string(),
-            command: "".to_string(),
             color: Color::Red,
         }
     }
 }
 
 impl Component for VimStatusBar {
-    fn handle_active_state(&mut self, active_widget: &crate::state::ActiveWidget) {
+    fn handle_active_state(&mut self, active_widget: &ActiveWidget) {
         match active_widget {
             ActiveWidget::StatusBar => self.color = Color::Blue,
             _ => self.color = Color::Red,
@@ -44,10 +42,10 @@ impl Component for VimStatusBar {
             .split(container_inner);
 
         self.state = match &app.state_context.current_mode {
-            crate::state::VimState::Normal(mode) => "NORMAL".to_string(),
-            crate::state::VimState::Command(mode) => "COMMAND".to_string(),
-            crate::state::VimState::Insert(mode) => "INSERT".to_string(),
-            crate::state::VimState::Visual(mode) => "VISUAL".to_string(),
+            crate::state::VimState::Normal(_mode) => "NORMAL".to_string(),
+            crate::state::VimState::Command(_mode) => "COMMAND".to_string(),
+            crate::state::VimState::Insert(_mode) => "INSERT".to_string(),
+            crate::state::VimState::Visual(_mode) => "VISUAL".to_string(),
         };
 
         frame.render_widget(container, area);

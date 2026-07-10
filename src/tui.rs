@@ -1,4 +1,3 @@
-pub mod edit_text;
 pub mod editor;
 pub mod todo_lists;
 pub mod todos;
@@ -11,7 +10,7 @@ use ratatui::style::Color;
 use ratatui::widgets::{Block, Borders, Padding};
 
 use crate::app;
-use crate::state::ActiveWidget::{self};
+use crate::types::ActiveWidget;
 
 pub struct TUI {
     pub editor: editor::Editor,

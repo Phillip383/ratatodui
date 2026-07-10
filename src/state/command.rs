@@ -1,14 +1,17 @@
-use crate::state::ActiveWidget;
-
 use super::{State, Transition};
+use crate::types::{
+    ActiveWidget,
+    AppAction::{self, Quit},
+};
 
 pub struct CommandMode;
 
 impl State for CommandMode {
-    fn handle_input(&self, input: char, active_widget: &ActiveWidget) -> Transition {
+    fn handle_input(&self, input: char, _active_widget: &ActiveWidget) -> Transition {
         //TODO: Add save commands, and exit command state
+
         if input == 'q' {
-            return Transition::Command(String::from(input));
+            return Transition::Action(AppAction::Quit);
         }
         Transition::Stay
     }

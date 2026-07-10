@@ -1,28 +1,22 @@
-use crate::state::ActiveWidget;
+use crate::types::ActiveWidget;
 
 use super::{Component, app};
 use ratatui::{Frame, layout::Rect, style::Color, widgets::List};
 
 pub struct TodoLists {
-    items: Vec<String>,
-    selected_index: usize,
     color: Color,
 }
 
 impl TodoLists {
     pub fn new() -> Self {
-        TodoLists {
-            items: vec!["asdfa".to_string(), "dsfs".to_string(), "werf".to_string()],
-            selected_index: 0,
-            color: Color::Red,
-        }
+        TodoLists { color: Color::Red }
     }
 }
 
 impl Component for TodoLists {
-    fn handle_active_state(&mut self, active_widget: &crate::state::ActiveWidget) {
+    fn handle_active_state(&mut self, active_widget: &ActiveWidget) {
         match active_widget {
-            ActiveWidget::Lists => self.color = Color::Blue,
+            ActiveWidget::Lists(None) => self.color = Color::Blue,
             _ => self.color = Color::Red,
         };
     }

@@ -7,8 +7,14 @@ use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
 
 use crate::state::{
-    Transition::{ChangeFocus, ChangeState, Command},
+    Transition::{Action, ChangeFocus, ChangeState},
     VimState::{Normal, Visual},
+};
+
+use crate::types::{
+    ActiveWidget::{self, EditorTodoDesc, EditorTodoName},
+    AppAction::{self, *},
+    Direction,
 };
 
 pub trait State {
@@ -26,34 +32,32 @@ pub enum Transition {
     Stay,
     ChangeState(VimState),
     ChangeFocus(ActiveWidget, Option<VimState>),
-    Command(String),
-}
-
-#[derive(PartialEq, Eq)]
-pub enum ActiveWidget {
-    Todos,
-    Lists,
-    Editor,
-    StatusBar,
-    EditorTodoName,
-    EditorTodoDesc,
+    Action(AppAction),
 }
 
 pub struct StateContext {
     pub current_mode: VimState,
     pub active_widget: ActiveWidget,
+    pub active_list_item: usize,
+    pub active_todo: usize,
+    pub todo_name: String,
+    pub todo_desc: String,
+    pub b_quit: bool,
 }
 
 impl StateContext {
     pub fn new() -> Self {
         Self {
             current_mode: VimState::Normal(normal::NormalMode),
-            active_widget: ActiveWidget::Todos,
+            active_widget: ActiveWidget::Todos(None),
+            active_list_item: 0,
+            active_todo: 0,
+            todo_name: String::new(),
+            todo_desc: String::new(),
+            b_quit: false,
         }
     }
 
-    /// Returns () if quit was initiated
-    /// TODO: This will become more robust.
     pub fn handle_events(&mut self) -> Result<Option<()>, ErrReport> {
         if let Event::Key(key) = event::read()? {
             //Handle escape, every state goes back to normal mode via escape.
@@ -78,32 +82,37 @@ impl StateContext {
                     };
                 }
 
+                //TODO: Handle app actions
                 match transition {
                     ChangeState(new_state) => self.current_mode = new_state,
-                    Command(cmd) => {
-                        if cmd == "q" {
-                            return Ok(Some(()));
-                        }
-                    }
                     ChangeFocus(widget, mode) => {
                         self.active_widget = widget;
                         if let Some(m) = mode {
                             self.current_mode = m;
                         };
                     }
+                    Action(action) => self.handle_action(action),
                     _ => (),
                 }
             }
         }
         Ok(None)
     }
-}
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn change_focus() {}
+    pub fn handle_action(&mut self, action: AppAction) {
+        match action {
+            UpdateActiveList(index) => self.active_list_item = index,
+            UpdateActiveTodo(index) => self.active_todo = index,
+            InsertChar(c) => match self.active_widget {
+                EditorTodoName => self.todo_name.push(c),
+                EditorTodoDesc => self.todo_desc.push(c),
+                _ => (),
+            },
+            Backspace => (),
+            Quit => self.b_quit = true,
+            _ => (),
+        }
+    }
 
-    #[test]
-    fn change_state() {}
+    fn handle_char_input(c: char) {}
 }
