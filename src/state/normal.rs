@@ -1,13 +1,11 @@
 use super::{State, Transition, VimState};
-use crate::state::{
-    ActiveWidget::{self, Editor, Lists, Todos},
-    Direction, insert, visual,
-};
+use crate::state::{insert, visual};
+use crate::types::ActiveWidget;
 
 pub struct NormalMode;
 
 impl State for NormalMode {
-    fn handle_input(&self, input: char, active_widget: &ActiveWidget) -> Transition {
+    fn handle_input(&self, input: char, _active_widget: &ActiveWidget) -> Transition {
         //TODO: Flesh this out...
         match input {
             'i' => return Transition::ChangeState(VimState::Insert(insert::InsertMode)),
@@ -20,14 +18,5 @@ impl State for NormalMode {
         }
 
         Transition::Stay
-    }
-}
-
-fn handle_vertical_focus(_direction: Direction, active_widget: &ActiveWidget) -> Transition {
-    match active_widget {
-        Todos(None) => return Transition::ChangeFocus(Todos(Some(_direction)), None),
-        Editor(None) => return Transition::ChangeFocus(Editor(Some(_direction)), None),
-        Lists(None) => return Transition::ChangeFocus(Lists(Some(_direction)), None),
-        _ => Transition::Stay,
     }
 }
