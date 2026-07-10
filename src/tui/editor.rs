@@ -6,33 +6,50 @@ use ratatui::{
 };
 use tui_textarea::TextArea;
 
-use crate::app;
 use crate::types::ActiveWidget;
+use crate::{
+    app,
+    types::ActiveWidget::{EditorTodoDesc, EditorTodoName},
+};
 
 use super::Component;
 
 pub struct Editor {
-    color: Color,
+    title_color: Color,
+    desc_color: Color,
 }
 
 impl Editor {
     pub fn new() -> Self {
-        Editor { color: Color::Red }
+        Editor {
+            title_color: Color::Red,
+            desc_color: Color::Red,
+        }
     }
 }
 
 impl Component for Editor {
     fn handle_active_state(&mut self, active_widget: &ActiveWidget) {
         match active_widget {
-            ActiveWidget::Editor(None) => self.color = Color::Blue,
-            _ => self.color = Color::Red,
-        };
+            EditorTodoName => {
+                self.title_color = Color::Blue;
+                self.desc_color = Color::Red;
+            }
+            EditorTodoDesc => {
+                self.desc_color = Color::Blue;
+                self.title_color = Color::Red;
+            }
+            _ => {
+                self.title_color = Color::Red;
+                self.desc_color = Color::Red;
+            }
+        }
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
         self.handle_active_state(&app.state_context.active_widget);
 
-        let editor_block = super::border_box(self.color, "Ratatodui", Some("[S]ave [C]ancel"));
+        let editor_block = super::border_box(Color::Red, "Ratatodui", Some("[S]ave [C]ancel"));
         let editor_inner = editor_block.inner(area);
 
         let editor_layout = Layout::default()
@@ -50,8 +67,10 @@ impl Component for Editor {
         title.set_block(
             Block::default()
                 .borders(Borders::ALL)
-                .style(Color::Red)
-                .border_type(BorderType::Rounded),
+                .style(self.title_color)
+                .border_type(BorderType::Rounded)
+                .title_top("[N]ame")
+                .title_style(Color::LightYellow),
         );
 
         let mut desc = TextArea::default();
@@ -59,9 +78,11 @@ impl Component for Editor {
         desc.set_block(
             Block::default()
                 .borders(Borders::ALL)
-                .style(Color::Red)
+                .style(self.desc_color)
                 .padding(Padding::uniform(1))
-                .border_type(BorderType::Rounded),
+                .border_type(BorderType::Rounded)
+                .title_top("[D]escription")
+                .title_style(Color::LightYellow),
         );
 
         let text_title: Vec<String> = todo_title.split("\n").map(String::from).collect();

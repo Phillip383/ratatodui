@@ -14,9 +14,8 @@ impl State for NormalMode {
             'v' => return Transition::ChangeState(VimState::Visual(visual::VisualMode)),
             'L' => return Transition::ChangeFocus(ActiveWidget::Lists(None), None),
             'T' => return Transition::ChangeFocus(ActiveWidget::Todos(None), None),
-            'E' => return Transition::ChangeFocus(ActiveWidget::Editor(None), None),
-            'J' => return handle_vertical_focus(Direction::DOWN, active_widget),
-            'K' => return handle_vertical_focus(Direction::UP, active_widget),
+            'N' => return Transition::ChangeFocus(ActiveWidget::EditorTodoName, None),
+            'D' => return Transition::ChangeFocus(ActiveWidget::EditorTodoDesc, None),
             _ => (),
         }
 
