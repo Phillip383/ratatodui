@@ -13,6 +13,8 @@ impl State for InsertMode {
         //TODO: Flesh this out...
         if _input == KeyCode::Backspace {
             return Transition::Action(AppAction::Backspace);
+        } else if _input == KeyCode::Enter && *_active_widget == ActiveWidget::EditorTodoDesc {
+            return Transition::Action(AppAction::InsertChar('\n'));
         } else {
             if let Some(c) = _input.as_char() {
                 match _active_widget {
