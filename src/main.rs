@@ -18,13 +18,12 @@ fn main() -> Result<(), ErrReport> {
 
 pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
     let mut tui = tui::TUI::new();
-    let state_context = state::StateContext::new();
-    let mut app = App::new(state_context);
+    let mut app = App::new();
 
     loop {
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
-        app.state_context.handle_events()?;
-        if app.state_context.b_quit {
+        app.handle_events()?;
+        if app.b_quit {
             break Ok(());
         }
     }

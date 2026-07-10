@@ -22,13 +22,13 @@ impl Component for TodoList {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        self.handle_active_state(&app.state_context.active_widget);
+        self.handle_active_state(&app.active_widget);
 
         let list_container =
             super::border_box(self.color, "[T]odos", Some("[C]reate [D]elete [E]dit"));
         let list_inner = list_container.inner(area);
 
-        let list = List::new(&app.lists[app.state_context.active_list_item].todos);
+        let list = List::new(&app.lists[app.active_list_item].todos);
         frame.render_widget(list, list_inner);
 
         frame.render_widget(list_container, area);

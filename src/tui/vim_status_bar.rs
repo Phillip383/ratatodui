@@ -31,7 +31,7 @@ impl Component for VimStatusBar {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        self.handle_active_state(&app.state_context.active_widget);
+        self.handle_active_state(&app.active_widget);
 
         let container = Block::new().padding(Padding::horizontal(1));
         let container_inner = container.inner(area);
@@ -41,7 +41,7 @@ impl Component for VimStatusBar {
             .constraints([Constraint::Percentage(10), Constraint::Min(0)])
             .split(container_inner);
 
-        self.state = match &app.state_context.current_mode {
+        self.state = match &app.current_mode {
             crate::state::VimState::Normal(_mode) => "NORMAL".to_string(),
             crate::state::VimState::Command(_mode) => "COMMAND".to_string(),
             crate::state::VimState::Insert(_mode) => "INSERT".to_string(),

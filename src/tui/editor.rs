@@ -47,7 +47,7 @@ impl Component for Editor {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        self.handle_active_state(&app.state_context.active_widget);
+        self.handle_active_state(&app.active_widget);
 
         let editor_block = super::border_box(Color::Red, "Ratatodui", Some("[S]ave [C]ancel"));
         let editor_inner = editor_block.inner(area);
@@ -57,10 +57,9 @@ impl Component for Editor {
             .constraints([Constraint::Length(3), Constraint::Min(0)])
             .split(editor_inner);
 
-        let active_todo =
-            &app.lists[app.state_context.active_list_item].todos[app.state_context.active_todo];
+        let active_todo = &app.lists[app.active_list_item].todos[app.active_todo];
         let todo_title = active_todo.title.as_str();
-        let todo_desc = active_todo.description.as_deref().unwrap_or("");
+        let todo_desc = &active_todo.description;
 
         let mut title = TextArea::default();
         title.set_placeholder_text("Name");

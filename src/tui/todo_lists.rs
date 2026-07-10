@@ -22,7 +22,7 @@ impl Component for TodoLists {
     }
 
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
-        self.handle_active_state(&app.state_context.active_widget);
+        self.handle_active_state(&app.active_widget);
 
         let list_container =
             super::border_box(self.color, "[L]ists", Some("[C]reate [D]elete [S]elect"));
