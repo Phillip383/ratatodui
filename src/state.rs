@@ -14,7 +14,6 @@ use crate::state::{
 use crate::types::{
     ActiveWidget::{self, EditorTodoDesc, EditorTodoName},
     AppAction::{self, *},
-    Direction,
 };
 
 pub trait State {
@@ -113,6 +112,4 @@ impl StateContext {
             _ => (),
         }
     }
-
-    fn handle_char_input(c: char) {}
 }
