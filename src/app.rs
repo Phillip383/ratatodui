@@ -146,6 +146,7 @@ impl App {
                 }
                 _ => (),
             },
+            Save(data) => (), //TODO: Serialize to local temp file
             Quit => self.b_quit = true,
         }
     }

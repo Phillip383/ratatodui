@@ -72,6 +72,8 @@ impl Component for Editor {
                 .title_style(Color::LightYellow),
         );
 
+        title.insert_str(todo_title);
+
         let mut desc = TextArea::default();
         desc.set_placeholder_text("description...");
         desc.set_block(
@@ -83,12 +85,7 @@ impl Component for Editor {
                 .title_top("[D]escription")
                 .title_style(Color::LightYellow),
         );
-
-        let text_title: Vec<String> = todo_title.split("\n").map(String::from).collect();
-        title.set_lines(text_title, (0, 0));
-
-        let text_desc: Vec<String> = todo_desc.split("\n").map(String::from).collect();
-        desc.set_lines(text_desc, (0, 0));
+        desc.insert_str(todo_desc);
 
         frame.render_widget(&title, editor_layout[0]);
 

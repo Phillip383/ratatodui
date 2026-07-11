@@ -18,6 +18,7 @@ pub enum AppAction {
     UpdateActiveList(usize),
     UpdateActiveTodo(usize),
     InsertChar(char),
+    Save(String),
     Backspace,
     Quit,
 }
