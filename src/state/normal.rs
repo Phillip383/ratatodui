@@ -1,6 +1,7 @@
 use super::{State, Transition, VimState};
 use crate::state::{insert, visual};
 use crate::types::ActiveWidget;
+use crate::types::AppAction;
 use crossterm::event::KeyCode;
 
 pub struct NormalMode;
@@ -16,6 +17,7 @@ impl State for NormalMode {
                 'T' => return Transition::ChangeFocus(ActiveWidget::Todos(None), None),
                 'N' => return Transition::ChangeFocus(ActiveWidget::EditorTodoName, None),
                 'D' => return Transition::ChangeFocus(ActiveWidget::EditorTodoDesc, None),
+                'S' => return Transition::Action(AppAction::Save),
                 _ => (),
             }
         }

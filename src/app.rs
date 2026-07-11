@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use ratatui::widgets::ListItem;
 
 use color_eyre::eyre::{ErrReport, Result};
@@ -19,7 +21,7 @@ pub struct Todo {
     pub title: String,
     pub description: String,
     pub due_date: String, //TODO: Check for a better way to store dates.
-    pub subtasks: Option<Box<Vec<Todo>>>,
+    pub subtasks: Option<Vec<Todo>>,
     pub is_complete: bool,
 }
 
@@ -146,8 +148,25 @@ impl App {
                 }
                 _ => (),
             },
-            Save(data) => (), //TODO: Serialize to local temp file
+            Save => {
+                let _result = self.save();
+                //TODO:  Tell service to Sync file to Mongo/Google
+            }
             Quit => self.b_quit = true,
         }
+    }
+
+    fn save(&self) -> Result<std::fs::File, ErrReport> {
+        //TODO: Write all lists and todos in JSON...
+        let todo = &self.lists[self.active_list_item].todos[self.active_todo];
+        let data = format!("{} \n {}", todo.title, todo.description);
+
+        let mut file = std::fs::File::create("/home/phillip/todos_temp")?;
+        file.write_all(data.as_bytes())?;
+        Ok(file)
+    }
+
+    fn load(&mut self) {
+        //TODO: Use a config file to load in from the users chosen directory or service.
     }
 }
