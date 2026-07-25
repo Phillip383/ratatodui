@@ -25,7 +25,7 @@ impl TodoList {
 impl Component for TodoList {
     fn handle_active_state(&mut self, active_widget: &ActiveWidget) {
         match active_widget {
-            ActiveWidget::Todos(None) => self.color = Color::Blue,
+            ActiveWidget::Todos => self.color = Color::Blue,
             _ => self.color = Color::Red,
         };
     }

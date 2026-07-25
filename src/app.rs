@@ -77,7 +77,7 @@ impl App {
                 ],
             }],
             current_mode: VimState::Normal(normal::NormalMode),
-            active_widget: ActiveWidget::Todos(None),
+            active_widget: ActiveWidget::Todos,
             active_list_item: 0,
             active_todo: 0,
             b_quit: false,

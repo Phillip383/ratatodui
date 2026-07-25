@@ -1,14 +1,8 @@
 #[derive(PartialEq, Eq)]
-pub enum Direction {
-    UP,
-    DOWN,
-}
-
-#[derive(PartialEq, Eq)]
 pub enum ActiveWidget {
-    Todos(Option<Direction>),
-    Lists(Option<Direction>),
-    Editor(Option<Direction>),
+    Todos,
+    Lists,
+    Editor,
     StatusBar,
     EditorTodoName,
     EditorTodoDesc,

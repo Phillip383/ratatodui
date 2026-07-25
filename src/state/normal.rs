@@ -13,25 +13,25 @@ impl State for NormalMode {
             match c {
                 'i' => return Transition::ChangeState(VimState::Insert(insert::InsertMode)),
                 'v' => return Transition::ChangeState(VimState::Visual(visual::VisualMode)),
-                'L' => return Transition::ChangeFocus(ActiveWidget::Lists(None), None),
-                'T' => return Transition::ChangeFocus(ActiveWidget::Todos(None), None),
+                'L' => return Transition::ChangeFocus(ActiveWidget::Lists, None),
+                'T' => return Transition::ChangeFocus(ActiveWidget::Todos, None),
                 'N' => return Transition::ChangeFocus(ActiveWidget::EditorTodoName, None),
                 'D' => return Transition::ChangeFocus(ActiveWidget::EditorTodoDesc, None),
                 'S' => return Transition::Action(AppAction::Save),
                 'j' => match _active_widget {
-                    ActiveWidget::Todos(_) => {
+                    ActiveWidget::Todos => {
                         return Transition::Action(AppAction::UpdateActiveTodo(1));
                     }
-                    ActiveWidget::Lists(_) => {
+                    ActiveWidget::Lists => {
                         return Transition::Action(AppAction::UpdateActiveList(1));
                     }
                     _ => (),
                 },
                 'k' => match _active_widget {
-                    ActiveWidget::Todos(_) => {
+                    ActiveWidget::Todos => {
                         return Transition::Action(AppAction::UpdateActiveTodo(-1));
                     }
-                    ActiveWidget::Lists(_) => {
+                    ActiveWidget::Lists => {
                         return Transition::Action(AppAction::UpdateActiveList(-1));
                     }
                     _ => (),
