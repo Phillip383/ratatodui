@@ -57,25 +57,44 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            lists: vec![TodoList {
-                title: "Default".to_string(),
-                todos: vec![
-                    Todo {
-                        title: "Bread".to_string(),
+            lists: vec![
+                TodoList {
+                    title: "Default".to_string(),
+                    todos: vec![
+                        Todo {
+                            title: "Bread".to_string(),
+                            description: String::new(),
+                            due_date: String::new(),
+                            subtasks: None,
+                            is_complete: false,
+                        },
+                        Todo {
+                            title: "Milk".to_string(),
+                            description: String::new(),
+                            due_date: String::new(),
+                            subtasks: None,
+                            is_complete: true,
+                        },
+                        Todo {
+                            title: "Cheese".to_string(),
+                            description: String::new(),
+                            due_date: String::new(),
+                            subtasks: None,
+                            is_complete: false,
+                        },
+                    ],
+                },
+                TodoList {
+                    title: "School".to_string(),
+                    todos: vec![Todo {
+                        title: "Discussion Assignment".to_string(),
                         description: String::new(),
                         due_date: String::new(),
                         subtasks: None,
                         is_complete: false,
-                    },
-                    Todo {
-                        title: "Milk".to_string(),
-                        description: String::new(),
-                        due_date: String::new(),
-                        subtasks: None,
-                        is_complete: true,
-                    },
-                ],
-            }],
+                    }],
+                },
+            ],
             current_mode: VimState::Normal(normal::NormalMode),
             active_widget: ActiveWidget::Todos,
             active_list_item: 0,
