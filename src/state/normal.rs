@@ -18,10 +18,27 @@ impl State for NormalMode {
                 'N' => return Transition::ChangeFocus(ActiveWidget::EditorTodoName, None),
                 'D' => return Transition::ChangeFocus(ActiveWidget::EditorTodoDesc, None),
                 'S' => return Transition::Action(AppAction::Save),
+                'j' => match _active_widget {
+                    ActiveWidget::Todos(_) => {
+                        return Transition::Action(AppAction::UpdateActiveTodo(1));
+                    }
+                    ActiveWidget::Lists(_) => {
+                        return Transition::Action(AppAction::UpdateActiveList(1));
+                    }
+                    _ => (),
+                },
+                'k' => match _active_widget {
+                    ActiveWidget::Todos(_) => {
+                        return Transition::Action(AppAction::UpdateActiveTodo(-1));
+                    }
+                    ActiveWidget::Lists(_) => {
+                        return Transition::Action(AppAction::UpdateActiveList(-1));
+                    }
+                    _ => (),
+                },
                 _ => (),
             }
         }
-
         Transition::Stay
     }
 }

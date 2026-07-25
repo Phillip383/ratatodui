@@ -15,8 +15,8 @@ pub enum ActiveWidget {
 }
 
 pub enum AppAction {
-    UpdateActiveList(usize),
-    UpdateActiveTodo(usize),
+    UpdateActiveList(i8),
+    UpdateActiveTodo(i8),
     InsertChar(char),
     Save,
     Backspace,

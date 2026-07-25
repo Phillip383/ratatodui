@@ -124,8 +124,27 @@ impl App {
 
     pub fn handle_action(&mut self, action: AppAction) {
         match action {
-            UpdateActiveList(index) => self.active_list_item = index,
-            UpdateActiveTodo(index) => self.active_todo = index,
+            //TODO: Handle index out of bounds, wrap to top/bottom list item.
+            UpdateActiveList(index) => {
+                if self.active_list_item as i8 + index < 0 {
+                    self.active_list_item = self.lists.len() - 1;
+                } else if self.active_list_item as i8 + index >= self.lists.len() as i8 {
+                    self.active_list_item = 0;
+                } else {
+                    self.active_list_item = (self.active_list_item as i8 + index) as usize;
+                }
+            }
+            UpdateActiveTodo(index) => {
+                if self.active_todo as i8 + index < 0 {
+                    self.active_todo = self.lists[self.active_list_item].todos.len() - 1;
+                } else if self.active_todo as i8 + index
+                    >= self.lists[self.active_list_item].todos.len() as i8
+                {
+                    self.active_todo = 0;
+                } else {
+                    self.active_todo = (self.active_todo as i8 + index) as usize;
+                }
+            }
             InsertChar(c) => match self.active_widget {
                 EditorTodoName => self.lists[self.active_list_item].todos[self.active_todo]
                     .title
