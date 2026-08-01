@@ -14,6 +14,7 @@ impl State for NormalMode {
                 'i' => return Transition::ChangeState(VimState::Insert(insert::InsertMode)),
                 'v' => return Transition::ChangeState(VimState::Visual(visual::VisualMode)),
                 'L' => return Transition::ChangeFocus(ActiveWidget::Lists, None),
+                'D' => return Transition::ChangeFocus(ActiveWidget::EditorTodoDesc, None),
                 'T' => return Transition::ChangeFocus(ActiveWidget::Todos, None),
                 'N' => return Transition::ChangeFocus(ActiveWidget::EditorTodoName, None),
                 'S' => return Transition::Action(AppAction::Save),
@@ -44,7 +45,7 @@ impl State for NormalMode {
                     }
                     _ => (),
                 },
-                'D' => match _active_widget {
+                'R' => match _active_widget {
                     ActiveWidget::Todos => {
                         return Transition::Action(AppAction::DeleteTodo);
                     }

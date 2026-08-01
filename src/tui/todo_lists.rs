@@ -35,7 +35,7 @@ impl Component for TodoLists {
         self.state.select(Some(app.active_list_item));
 
         let list_container =
-            super::border_box(self.color, "[L]ists", Some("[C]reate [D]elete [S]elect"));
+            super::border_box(self.color, "[L]ists", Some("[C]reate [R]emove [S]elect"));
         let list_inner = list_container.inner(area);
 
         let list = List::new(&app.lists)

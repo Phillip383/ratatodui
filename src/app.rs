@@ -168,12 +168,21 @@ impl App {
                 }
             }
             InsertChar(c) => match self.active_widget {
-                EditorTodoName => self.lists[self.active_list_item].todos[self.active_todo]
-                    .title
-                    .push(c),
-                EditorTodoDesc => self.lists[self.active_list_item].todos[self.active_todo]
-                    .description
-                    .push(c),
+                //TODO: Handle index out of bounds...
+                EditorTodoName => {
+                    if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                        if let Some(active_todo) = active_list.todos.get_mut(self.active_todo) {
+                            active_todo.title.push(c);
+                        }
+                    }
+                }
+                EditorTodoDesc => {
+                    if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                        if let Some(active_todo) = active_list.todos.get_mut(self.active_todo) {
+                            active_todo.description.push(c);
+                        }
+                    }
+                }
                 _ => (),
             },
             CreateList => self.create_list(),
@@ -181,15 +190,20 @@ impl App {
             DeleteList => self.delete_list(),
             DeleteTodo => self.delete_todo(),
             Backspace => match self.active_widget {
+                //TODO: Handle index out of bounds...
                 EditorTodoName => {
-                    self.lists[self.active_list_item].todos[self.active_todo]
-                        .title
-                        .pop();
+                    if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                        if let Some(active_todo) = active_list.todos.get_mut(self.active_todo) {
+                            active_todo.title.pop();
+                        }
+                    }
                 }
                 EditorTodoDesc => {
-                    self.lists[self.active_list_item].todos[self.active_todo]
-                        .description
-                        .pop();
+                    if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                        if let Some(active_todo) = active_list.todos.get_mut(self.active_todo) {
+                            active_todo.description.pop();
+                        }
+                    }
                 }
                 _ => (),
             },
