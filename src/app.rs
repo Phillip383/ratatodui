@@ -106,6 +106,10 @@ impl App {
     pub fn handle_events(&mut self) -> Result<Option<()>, ErrReport> {
         if let Event::Key(key) = event::read()? {
             //Handle escape, every state goes back to normal mode via escape.
+            if key.is_release() {
+                return Ok(None); //Ignore releases for now, we only care about key presses.
+            }
+
             if key.code == KeyCode::Esc {
                 self.current_mode = VimState::Normal(normal::NormalMode);
                 return Ok(None);
@@ -125,7 +129,6 @@ impl App {
                 },
             };
 
-            //TODO: Handle app actions
             match transition {
                 ChangeState(new_state) => self.current_mode = new_state,
                 ChangeFocus(widget, mode) => {
@@ -145,9 +148,10 @@ impl App {
         match action {
             //TODO: Handle index out of bounds, wrap to top/bottom list item.
             UpdateActiveList(index) => {
+                self.active_todo = 0; //Reset active todo when switching lists.
                 if self.active_list_item as i8 + index < 0 {
                     self.active_list_item = self.lists.len() - 1;
-                } else if self.active_list_item as i8 + index >= self.lists.len() as i8 {
+                } else if (self.active_list_item as i8 + index) >= self.lists.len() as i8 {
                     self.active_list_item = 0;
                 } else {
                     self.active_list_item = (self.active_list_item as i8 + index) as usize;
@@ -156,8 +160,7 @@ impl App {
             UpdateActiveTodo(index) => {
                 if self.active_todo as i8 + index < 0 {
                     self.active_todo = self.lists[self.active_list_item].todos.len() - 1;
-                } else if self.active_todo as i8 + index
-                    >= self.lists[self.active_list_item].todos.len() as i8
+                } else if (self.active_todo as i8 + index) >= self.lists[self.active_list_item].todos.len() as i8
                 {
                     self.active_todo = 0;
                 } else {
@@ -173,6 +176,10 @@ impl App {
                     .push(c),
                 _ => (),
             },
+            CreateList => self.create_list(),
+            CreateTodo => self.create_todo(),
+            DeleteList => self.delete_list(),
+            DeleteTodo => self.delete_todo(),
             Backspace => match self.active_widget {
                 EditorTodoName => {
                     self.lists[self.active_list_item].todos[self.active_todo]
@@ -204,7 +211,38 @@ impl App {
         Ok(file)
     }
 
-    fn load(&mut self) {
+    fn create_list(&mut self) {
+        self.lists.push(TodoList {
+            title: "New List".to_string(),
+            todos: vec![],
+        });
+    }
+
+    fn create_todo(&mut self) {
+        self.lists[self.active_list_item].todos.push(Todo {
+            title: "New Todo".to_string(),
+            description: String::new(),
+            due_date: String::new(),
+            subtasks: None,
+            is_complete: false,
+        });
+    }
+
+    fn delete_list(&mut self) {
+        if !self.lists.is_empty() {
+            self.lists.remove(self.active_list_item);
+            self.active_list_item = 0;
+        }
+    }
+
+    fn delete_todo(&mut self) {
+        if !self.lists[self.active_list_item].todos.is_empty() {
+            self.lists[self.active_list_item].todos.remove(self.active_todo);
+            self.active_todo = 0;
+        }
+    }
+
+    fn _load(&mut self) {
         //TODO: Use a config file to load in from the users chosen directory or service.
     }
 }

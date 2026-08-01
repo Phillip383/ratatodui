@@ -38,7 +38,11 @@ impl Component for TodoList {
             super::border_box(self.color, "[T]odos", Some("[C]reate [D]elete [E]dit"));
         let list_inner = list_container.inner(area);
 
-        let list = List::new(&app.lists[app.active_list_item].todos)
+        let Some(active_list) = app.lists.get(app.active_list_item) else {
+            return;
+        };
+
+        let list = List::new(&active_list.todos)
             .highlight_style(Style::new().red())
             .highlight_symbol(">> ");
         frame.render_stateful_widget(list, list_inner, &mut self.state);

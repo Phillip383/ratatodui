@@ -57,7 +57,17 @@ impl Component for Editor {
             .constraints([Constraint::Length(3), Constraint::Min(0)])
             .split(editor_inner);
 
-        let active_todo = &app.lists[app.active_list_item].todos[app.active_todo];
+
+        //Handle case where there are no lists, don't render empty editor.        
+        let Some(active_list) = &app.lists.get(app.active_list_item) else {
+            return;
+        };
+        
+        //Handle case where there are no todos in the list, don't render empty editor.
+        if app.lists[app.active_list_item].todos.is_empty() {
+            return;
+        }
+        let active_todo = &active_list.todos[app.active_todo];
         let todo_title = active_todo.title.as_str();
         let todo_desc = &active_todo.description;
 

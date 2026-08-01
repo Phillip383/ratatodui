@@ -16,7 +16,6 @@ impl State for NormalMode {
                 'L' => return Transition::ChangeFocus(ActiveWidget::Lists, None),
                 'T' => return Transition::ChangeFocus(ActiveWidget::Todos, None),
                 'N' => return Transition::ChangeFocus(ActiveWidget::EditorTodoName, None),
-                'D' => return Transition::ChangeFocus(ActiveWidget::EditorTodoDesc, None),
                 'S' => return Transition::Action(AppAction::Save),
                 'j' => match _active_widget {
                     ActiveWidget::Todos => {
@@ -33,6 +32,24 @@ impl State for NormalMode {
                     }
                     ActiveWidget::Lists => {
                         return Transition::Action(AppAction::UpdateActiveList(-1));
+                    }
+                    _ => (),
+                },
+                'C' => match _active_widget {
+                    ActiveWidget::Todos => {
+                        return Transition::Action(AppAction::CreateTodo);
+                    }
+                    ActiveWidget::Lists => {
+                        return Transition::Action(AppAction::CreateList);
+                    }
+                    _ => (),
+                },
+                'D' => match _active_widget {
+                    ActiveWidget::Todos => {
+                        return Transition::Action(AppAction::DeleteTodo);
+                    }
+                    ActiveWidget::Lists => {
+                        return Transition::Action(AppAction::DeleteList);
                     }
                     _ => (),
                 },
