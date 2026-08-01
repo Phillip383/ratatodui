@@ -39,6 +39,7 @@ impl Component for TodoList {
         let list_inner = list_container.inner(area);
 
         let Some(active_list) = app.lists.get(app.active_list_item) else {
+            frame.render_widget(list_container, area);
             return;
         };
 
