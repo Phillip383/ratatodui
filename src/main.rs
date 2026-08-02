@@ -2,6 +2,7 @@ mod app;
 mod state;
 mod tui;
 mod types;
+mod client;
 
 use color_eyre::eyre::{ErrReport, Result};
 use ratatui::DefaultTerminal;
@@ -9,13 +10,28 @@ use ratatui::DefaultTerminal;
 use app::App;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-fn main() -> Result<(), ErrReport> {
-    enable_raw_mode()?;
+#[tokio::main]
+async fn main() -> Result<(), ErrReport> {
     color_eyre::install()?;
+    
+    let client = client::Client::new();
+    if client.get_token().is_err() {
+        loop {
+            // Prompt for login credentials
+            println!("Please log in to continue.");
+            let username = rprompt::prompt_reply("Username: ")?;
+            let password = rprompt::prompt_reply("Password: ")?;
+            if client.login(&username, &password).await.is_ok() {
+                break;
+            }
+        }
+    }
+    
+    enable_raw_mode()?;
     ratatui::run(run)?;
     ratatui::restore();
     disable_raw_mode()?;
-
+    
     Ok(())
 }
 
