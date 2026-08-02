@@ -18,7 +18,7 @@ async fn main() -> Result<(), ErrReport> {
     if client.get_token().is_err() {
         loop {
             // Prompt for login credentials
-            println!("Please log in to continue.");
+            println!("\nPlease log in to continue.\n");
             let username = rprompt::prompt_reply("Username: ")?;
             let password = rprompt::prompt_reply("Password: ")?;
             if client.login(&username, &password).await.is_ok() {

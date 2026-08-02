@@ -35,6 +35,38 @@ impl Client {
         }
     }
 
+    pub async fn fetch_lists(&self) -> reqwest::Result<serde_json::Value> {
+        let token = self.get_token().expect("Failed to retrieve token from keyring");
+        let lists_url = format!("{}/lists", Self::BASE_URL);
+        let response = self.client.get(&lists_url)
+            .bearer_auth(token)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let data: serde_json::Value = response.json().await?;
+            Ok(data)
+        } else {
+            Err(reqwest::Error::from(response.error_for_status().unwrap_err()))
+        }
+    }
+
+    pub async fn fetch_tasks(&self, list_id: &str) -> reqwest::Result<serde_json::Value> {
+        let token = self.get_token().expect("Failed to retrieve token from keyring");
+        let tasks_url = format!("{}/todos?list={}", Self::BASE_URL, list_id);
+        let response = self.client.get(&tasks_url)
+            .bearer_auth(token)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let data: serde_json::Value = response.json().await?;
+            Ok(data)
+        } else {
+            Err(reqwest::Error::from(response.error_for_status().unwrap_err()))
+        }
+    }
+
     fn save_token(&self, token: &str) -> keyring::Result<()> {
         let keyring = Entry::new(Self::SERVICE_NAME, Self::TOKEN_KEY)?;
         keyring.set_password(token).expect("Failed to save token to keyring");

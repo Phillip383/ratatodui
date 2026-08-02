@@ -21,22 +21,22 @@ use crate::types::{
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Todo {
+    pub id: Option<String>,
     pub title: String,
     pub description: String,
-    pub due_date: Option<DateTime<Utc>>,
-    pub subtasks: Option<Vec<Todo>>,
-    pub is_complete: bool,
+    pub completed: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TodoList {
+    pub id: Option<String>,
     pub title: String,
     pub todos: Vec<Todo>,
 }
 
 impl<'a> From<&'a Todo> for ListItem<'a> {
     fn from(todo: &'a Todo) -> Self {
-        let checkbox = if todo.is_complete { "[x] " } else { "[ ] " };
+        let checkbox = if todo.completed { "[x] " } else { "[ ] " };
         let text = format!("{}{}", checkbox, todo.title);
 
         ListItem::new(text)
@@ -61,44 +61,7 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            lists: vec![
-                TodoList {
-                    title: "Default".to_string(),
-                    todos: vec![
-                        Todo {
-                            title: "Bread".to_string(),
-                            description: String::new(),
-                            due_date: Some(DateTime::from(Utc::now())),
-                            subtasks: None,
-                            is_complete: false,
-                        },
-                        Todo {
-                            title: "Milk".to_string(),
-                            description: String::new(),
-                            due_date: Some(DateTime::from(Utc::now())),
-                            subtasks: None,
-                            is_complete: true,
-                        },
-                        Todo {
-                            title: "Cheese".to_string(),
-                            description: String::new(),
-                            due_date: Some(DateTime::from(Utc::now())),
-                            subtasks: None,
-                            is_complete: false,
-                        },
-                    ],
-                },
-                TodoList {
-                    title: "School".to_string(),
-                    todos: vec![Todo {
-                        title: "Discussion Assignment".to_string(),
-                        description: String::new(),
-                        due_date: Some(DateTime::from(Utc::now())),
-                        subtasks: None,
-                        is_complete: false,
-                    }],
-                },
-            ],
+            lists: Vec::new(),
             current_mode: VimState::Normal(normal::NormalMode),
             active_widget: ActiveWidget::Todos,
             active_list_item: 0,
@@ -152,25 +115,29 @@ impl App {
         match action {
             //TODO: Handle index out of bounds, wrap to top/bottom list item.
             UpdateActiveList(index) => {
-                self.active_todo = 0; //Reset active todo when switching lists.
-                if self.active_list_item as i8 + index < 0 {
-                    self.active_list_item = self.lists.len() - 1;
-                } else if (self.active_list_item as i8 + index) >= self.lists.len() as i8 {
-                    self.active_list_item = 0;
-                } else {
-                    self.active_list_item = (self.active_list_item as i8 + index) as usize;
+                    self.active_todo = 0; //Reset active todo when switching lists.
+                    if self.active_list_item as i8 + index < 0 {
+                        self.active_list_item = self.lists.len() - 1;
+                    } else if (self.active_list_item as i8 + index) >= self.lists.len() as i8 {
+                        self.active_list_item = 0;
+                    } else {
+                        self.active_list_item = (self.active_list_item as i8 + index) as usize;
+                    }
                 }
-            }
             UpdateActiveTodo(index) => {
-                if self.active_todo as i8 + index < 0 {
-                    self.active_todo = self.lists[self.active_list_item].todos.len() - 1;
-                } else if (self.active_todo as i8 + index) >= self.lists[self.active_list_item].todos.len() as i8
-                {
-                    self.active_todo = 0;
-                } else {
-                    self.active_todo = (self.active_todo as i8 + index) as usize;
+                    if let Some(list) = self.lists.get(self.active_list_item) {
+                        let todos = &list.todos;
+                        if self.active_todo as i8 + index < 0 {
+                            self.active_todo = todos.len() - 1;
+                        } else if (self.active_todo as i8 + index) >= todos.len() as i8
+                        {
+                            self.active_todo = 0;
+                        } else {
+                            self.active_todo = (self.active_todo as i8 + index) as usize;
+                        }
+                    } 
+                    
                 }
-            }
             InsertChar(c) => match self.active_widget {
                 //TODO: Handle index out of bounds...
                 EditorTodoName => {
@@ -229,20 +196,23 @@ impl App {
         Ok(file)
     }
 
+    //TODO: Handle id's
     fn create_list(&mut self) {
         self.lists.push(TodoList {
+            id: None,
             title: "New List".to_string(),
-            todos: vec![],
+            todos: Vec::new(),
         });
     }
 
+    //TODO: Handle id's
     fn create_todo(&mut self) {
-        self.lists[self.active_list_item].todos.push(Todo {
+        self.lists[self.active_list_item].todos.push(
+        Todo {
+            id: None,
             title: "New Todo".to_string(),
             description: String::new(),
-            due_date: Some(DateTime::from(Utc::now())),
-            subtasks: None,
-            is_complete: false,
+            completed: false,
         });
     }
 
