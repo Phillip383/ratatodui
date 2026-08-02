@@ -8,3 +8,4 @@ ratatui = "0.30.2"
 crossterm = "0.29.0"
 color-eyre = "0.6.5"
 tui-textarea = { package = "tui-textarea-2", version = "*" }
+chrono = "0.4.0"

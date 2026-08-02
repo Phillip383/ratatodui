@@ -4,6 +4,7 @@ use ratatui::widgets::ListItem;
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
+use chrono::{DateTime, Utc};
 
 use crate::state::{
     State,
@@ -20,7 +21,7 @@ use crate::types::{
 pub struct Todo {
     pub title: String,
     pub description: String,
-    pub due_date: String, //TODO: Check for a better way to store dates.
+    pub due_date: DateTime<Utc>,
     pub subtasks: Option<Vec<Todo>>,
     pub is_complete: bool,
 }
@@ -64,21 +65,21 @@ impl App {
                         Todo {
                             title: "Bread".to_string(),
                             description: String::new(),
-                            due_date: String::new(),
+                            due_date: DateTime::from(Utc::now()),
                             subtasks: None,
                             is_complete: false,
                         },
                         Todo {
                             title: "Milk".to_string(),
                             description: String::new(),
-                            due_date: String::new(),
+                            due_date: DateTime::from(Utc::now()),
                             subtasks: None,
                             is_complete: true,
                         },
                         Todo {
                             title: "Cheese".to_string(),
                             description: String::new(),
-                            due_date: String::new(),
+                            due_date: DateTime::from(Utc::now()),
                             subtasks: None,
                             is_complete: false,
                         },
@@ -89,7 +90,7 @@ impl App {
                     todos: vec![Todo {
                         title: "Discussion Assignment".to_string(),
                         description: String::new(),
-                        due_date: String::new(),
+                        due_date: DateTime::from(Utc::now()),
                         subtasks: None,
                         is_complete: false,
                     }],
@@ -236,7 +237,7 @@ impl App {
         self.lists[self.active_list_item].todos.push(Todo {
             title: "New Todo".to_string(),
             description: String::new(),
-            due_date: String::new(),
+            due_date: DateTime::from(Utc::now()),
             subtasks: None,
             is_complete: false,
         });
