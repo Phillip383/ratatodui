@@ -28,16 +28,15 @@ async fn main() -> Result<(), ErrReport> {
     }
     
     enable_raw_mode()?;
-    ratatui::run(run)?;
+    ratatui::run(|t| run(t, client))?;
     ratatui::restore();
-    disable_raw_mode()?;
-    
+    disable_raw_mode()?; 
     Ok(())
 }
 
-pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
+pub fn run(terminal: &mut DefaultTerminal, client: client::Client) -> Result<(), ErrReport> {
     let mut tui = tui::TUI::new();
-    let mut app = App::new();
+    let mut app = App::new(client);
 
     loop {
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
@@ -46,4 +45,5 @@ pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
             break Ok(());
         }
     }
+
 }

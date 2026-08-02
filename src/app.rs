@@ -7,12 +7,12 @@ use crossterm::event::{self, Event, KeyCode};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::state::{
+use crate::{client, state::{
     State,
     Transition::{self, Action, ChangeFocus, ChangeState},
     VimState::{self, Normal, Visual},
     command, normal,
-};
+}};
 
 use crate::types::{
     ActiveWidget::{self, EditorTodoDesc, EditorTodoName},
@@ -50,6 +50,7 @@ impl<'a> From<&'a TodoList> for ListItem<'a> {
 }
 
 pub struct App {
+    client: client::Client,
     pub lists: Vec<TodoList>,
     pub current_mode: VimState,
     pub active_widget: ActiveWidget,
@@ -59,8 +60,9 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> Self {
+    pub fn new(client: client::Client) -> Self {
         App {
+            client,
             lists: Vec::new(),
             current_mode: VimState::Normal(normal::NormalMode),
             active_widget: ActiveWidget::Todos,
