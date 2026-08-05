@@ -197,22 +197,25 @@ impl App {
 
     //TODO: Handle id's
     fn create_list(&mut self) {
-        self.lists.push(TodoList {
+        let list = TodoList {
             id: String::from(""),
             title: "New List".to_string(),
             todos: Vec::new(),
-        });
+        };
+        self.lists.push(list);
     }
 
     //TODO: Handle id's
     fn create_todo(&mut self) {
-        self.lists[self.active_list_item].todos.push(
-        Todo {
-            id: None,
-            title: "New Todo".to_string(),
-            description: String::new(),
-            completed: false,
-        });
+        if let Some(list) = self.lists.get_mut(self.active_list_item) {
+            list.todos.push(
+                Todo {
+                    id: None,
+                    title: "New Todo".to_string(),
+                    description: String::new(),
+                    completed: false,
+            });
+        } 
     }
 
     fn delete_list(&mut self) {
