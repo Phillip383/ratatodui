@@ -1,7 +1,9 @@
-use std::{io::Write, time::Duration};
+use std::{io::Write, path::PathBuf, time::Duration};
+use app_dirs2::{AppDataType, AppInfo};
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
+use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
 use crate::{state::{
@@ -19,9 +21,28 @@ use crate::types::{
     SaveStatus,
 };
 
+const APP_INFO: AppInfo = AppInfo {
+    name: "data",
+    author: "Ratatodui"
+};
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Config {
+    version: String,
+    save_dir: PathBuf
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self { 
+            version: String::from("0.1.0"), 
+            save_dir: app_dirs2::app_dir(AppDataType::SharedData, &APP_INFO, "todos").unwrap(),
+        }
+    }
+}
 
 pub struct App {
+    config: Config,
     pub save_tx: mpsc::UnboundedSender<Result<(), String>>,
     pub save_rx: mpsc::UnboundedReceiver<Result<(), String>>,
     pub lists: Vec<TodoList>,
@@ -31,13 +52,13 @@ pub struct App {
     pub active_todo: usize,
     pub b_quit: bool,
     pub save_status: SaveStatus,
-
 }
 
 impl App {
-    pub fn new() -> Self {
+    pub fn new(config: Config) -> Self {
         let (save_tx, save_rx) = mpsc::unbounded_channel();
         App {
+            config,
             save_rx,
             save_tx,
             lists: Vec::new(),
@@ -179,19 +200,18 @@ impl App {
             Save => {
                 let _result = self.save();
                 //TODO:  Save with channel...
-
+                println!("{:?}", _result);
             }
             Quit => self.b_quit = true,
         }
     }
 
     fn save(&self) -> Result<std::fs::File, ErrReport> {
-        //TODO: Write all lists and todos in JSON...
-        let todo = &self.lists[self.active_list_item].todos[self.active_todo];
-        let data = format!("{} \n {}", todo.title, todo.description);
-
-        let mut file = std::fs::File::create("/home/phillip/todos_temp")?;
-        file.write_all(data.as_bytes())?;
+        let d = serde_json::to_string_pretty(&self.lists)?;
+        let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json");
+        //Update File Path to be changeable with sensable default in config.
+        let mut file = std::fs::File::create(path)?;
+        file.write_all(d.as_bytes())?;
         Ok(file)
     }
 
@@ -231,8 +251,5 @@ impl App {
             self.active_todo = 0;
         }
     }
-
-    fn _load(&mut self) {
-        //TODO: Use a config file to load in from the users chosen directory or service.
-    }
+    
 }

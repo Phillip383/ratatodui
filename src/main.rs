@@ -9,6 +9,8 @@ use ratatui::DefaultTerminal;
 use app::App;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
+use crate::app::Config;
+
 #[tokio::main]
 async fn main() -> Result<(), ErrReport> {
     color_eyre::install()?;
@@ -23,8 +25,9 @@ async fn main() -> Result<(), ErrReport> {
 }
 
 pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
+    let config: Config= confy::load("Ratatodui", None)?;
     let mut tui = tui::TUI::new();
-    let mut app = App::new();
+    let mut app = App::new(config);
 
    app.init(); 
 

@@ -47,8 +47,6 @@ pub struct TodoList {
     #[serde(rename = "_id")]        
     pub id: String,
     pub title: String,
-    
-    #[serde(skip)]
     pub todos: Vec<Todo>,
 }
 
