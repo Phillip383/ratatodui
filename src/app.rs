@@ -1,4 +1,4 @@
-use std::{io::Write, path::PathBuf, time::Duration};
+use std::{fs::read_to_string, io::Write, path::PathBuf, time::Duration};
 use app_dirs2::{AppDataType, AppInfo};
 
 use color_eyre::eyre::{ErrReport, Result};
@@ -72,7 +72,10 @@ impl App {
     }
 
     pub fn init(&mut self) {
-        //TODO: Load data
+        //TODO: Use the async version or start a channel.
+        let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json");
+        let data = read_to_string(path).unwrap(); //TODO: Remove the unwrap, it'll crash.
+        self.lists = serde_json::from_str(data.as_str()).unwrap();
 
     }
 
