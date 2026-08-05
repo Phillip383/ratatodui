@@ -6,7 +6,7 @@ use ratatui::{
 };
 use tui_textarea::TextArea;
 
-use crate::types::ActiveWidget;
+use crate::types::ActiveWidget::{self, EditorListName};
 use crate::{
     app,
     types::ActiveWidget::{EditorTodoDesc, EditorTodoName},
@@ -43,6 +43,9 @@ impl Component for Editor {
             EditorTodoDesc => {
                 self.desc_color = Color::Blue;
                 self.title_color = Color::Red;
+            }
+            EditorListName => {
+                self.title_color = Color::Blue;
             }
             _ => {
                 self.title_color = Color::Red;
