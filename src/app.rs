@@ -1,13 +1,10 @@
-use std::io::Write;
-
-use ratatui::widgets::ListItem;
+use std::{io::Write, time::Duration};
 
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use tokio::sync::mpsc;
 
-use crate::{client, state::{
+use crate::{state::{
     State,
     Transition::{self, Action, ChangeFocus, ChangeState},
     VimState::{self, Normal, Visual},
@@ -17,97 +14,86 @@ use crate::{client, state::{
 use crate::types::{
     ActiveWidget::{self, EditorTodoDesc, EditorTodoName},
     AppAction::{self, *},
+    Todo,
+    TodoList,
+    SaveStatus,
 };
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Todo {
-    pub id: Option<String>,
-    pub title: String,
-    pub description: String,
-    pub completed: bool,
-}
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct TodoList {
-    pub id: Option<String>,
-    pub title: String,
-    pub todos: Vec<Todo>,
-}
-
-impl<'a> From<&'a Todo> for ListItem<'a> {
-    fn from(todo: &'a Todo) -> Self {
-        let checkbox = if todo.completed { "[x] " } else { "[ ] " };
-        let text = format!("{}{}", checkbox, todo.title);
-
-        ListItem::new(text)
-    }
-}
-
-impl<'a> From<&'a TodoList> for ListItem<'a> {
-    fn from(list: &'a TodoList) -> Self {
-        ListItem::new(list.title.as_str())
-    }
-}
 
 pub struct App {
-    client: client::Client,
+    pub save_tx: mpsc::UnboundedSender<Result<(), String>>,
+    pub save_rx: mpsc::UnboundedReceiver<Result<(), String>>,
     pub lists: Vec<TodoList>,
     pub current_mode: VimState,
     pub active_widget: ActiveWidget,
     pub active_list_item: usize,
     pub active_todo: usize,
     pub b_quit: bool,
+    pub save_status: SaveStatus,
+
 }
 
 impl App {
-    pub fn new(client: client::Client) -> Self {
+    pub fn new() -> Self {
+        let (save_tx, save_rx) = mpsc::unbounded_channel();
         App {
-            client,
+            save_rx,
+            save_tx,
             lists: Vec::new(),
             current_mode: VimState::Normal(normal::NormalMode),
             active_widget: ActiveWidget::Todos,
             active_list_item: 0,
             active_todo: 0,
             b_quit: false,
+            save_status: SaveStatus::Idle
         }
     }
 
+    pub fn init(&mut self) {
+        //TODO: Load data
+
+    }
+
     pub fn handle_events(&mut self) -> Result<Option<()>, ErrReport> {
-        if let Event::Key(key) = event::read()? {
-            //Handle escape, every state goes back to normal mode via escape.
-            if key.is_release() {
-                return Ok(None); //Ignore releases for now, we only care about key presses.
-            }
-
-            if key.code == KeyCode::Esc {
-                self.current_mode = VimState::Normal(normal::NormalMode);
-                return Ok(None);
-            }
-
-            let transition: Transition = match key.code {
-                KeyCode::Char(':') => Transition::ChangeFocus(
-                    ActiveWidget::StatusBar,
-                    Some(VimState::Command(command::CommandMode)),
-                ),
-
-                _ => match &self.current_mode {
-                    Normal(mode) => mode.handle_input(key.code, &self.active_widget),
-                    Visual(mode) => mode.handle_input(key.code, &self.active_widget),
-                    VimState::Command(mode) => mode.handle_input(key.code, &self.active_widget),
-                    VimState::Insert(mode) => mode.handle_input(key.code, &self.active_widget),
-                },
-            };
-
-            match transition {
-                ChangeState(new_state) => self.current_mode = new_state,
-                ChangeFocus(widget, mode) => {
-                    self.active_widget = widget;
-                    if let Some(m) = mode {
-                        self.current_mode = m;
-                    };
+        if event::poll(Duration::from_millis(50))? {
+            
+            if let Event::Key(key) = event::read()? {
+                //Handle escape, every state goes back to normal mode via escape.
+                if key.is_release() {
+                    return Ok(None); //Ignore releases for now, we only care about key presses.
                 }
-                Action(action) => self.handle_action(action),
-                _ => (),
+                
+                if key.code == KeyCode::Esc {
+                    self.current_mode = VimState::Normal(normal::NormalMode);
+                    return Ok(None);
+                }
+                
+                let transition: Transition = match key.code {
+                    KeyCode::Char(':') => Transition::ChangeFocus(
+                        ActiveWidget::StatusBar,
+                        Some(VimState::Command(command::CommandMode)),
+                    ),
+                    
+                    _ => match &self.current_mode {
+                        Normal(mode) => mode.handle_input(key.code, &self.active_widget),
+                        Visual(mode) => mode.handle_input(key.code, &self.active_widget),
+                        VimState::Command(mode) => mode.handle_input(key.code, &self.active_widget),
+                        VimState::Insert(mode) => mode.handle_input(key.code, &self.active_widget),
+                    },
+                };
+                
+                match transition {
+                    ChangeState(new_state) => self.current_mode = new_state,
+                    ChangeFocus(widget, mode) => {
+                        self.active_widget = widget;
+                        if let Some(m) = mode {
+                            self.current_mode = m;
+                        };
+                    }
+                    Action(action) => self.handle_action(action),
+                    _ => (),
+                }
             }
         }
         Ok(None)
@@ -182,7 +168,8 @@ impl App {
             },
             Save => {
                 let _result = self.save();
-                //TODO:  Tell service to Sync file to Mongo/Google
+                //TODO:  Save with channel...
+
             }
             Quit => self.b_quit = true,
         }
@@ -201,7 +188,7 @@ impl App {
     //TODO: Handle id's
     fn create_list(&mut self) {
         self.lists.push(TodoList {
-            id: None,
+            id: String::from(""),
             title: "New List".to_string(),
             todos: Vec::new(),
         });

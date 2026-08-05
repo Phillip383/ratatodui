@@ -2,7 +2,6 @@ mod app;
 mod state;
 mod tui;
 mod types;
-mod client;
 
 use color_eyre::eyre::{ErrReport, Result};
 use ratatui::DefaultTerminal;
@@ -14,36 +13,39 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 async fn main() -> Result<(), ErrReport> {
     color_eyre::install()?;
     
-    let client = client::Client::new();
-    if client.get_token().is_err() {
-        loop {
-            // Prompt for login credentials
-            println!("\nPlease log in to continue.\n");
-            let username = rprompt::prompt_reply("Username: ")?;
-            let password = rprompt::prompt_reply("Password: ")?;
-            if client.login(&username, &password).await.is_ok() {
-                break;
-            }
-        }
-    }
     
     enable_raw_mode()?;
-    ratatui::run(|t| run(t, client))?;
+    ratatui::run(|t| run(t))?;
     ratatui::restore();
-    disable_raw_mode()?; 
+    disable_raw_mode()?;
+     
     Ok(())
 }
 
-pub fn run(terminal: &mut DefaultTerminal, client: client::Client) -> Result<(), ErrReport> {
+pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
     let mut tui = tui::TUI::new();
-    let mut app = App::new(client);
+    let mut app = App::new();
+
+   app.init(); 
 
     loop {
+
+        
+        if let Ok(result) = app.save_rx.try_recv() {
+            match result {
+                Ok(_) => app.save_status = types::SaveStatus::Success,
+                Err(msg) => app.save_status = types::SaveStatus::Error(msg)
+            }
+        }
+
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
-        app.handle_events()?;
+        
         if app.b_quit {
             break Ok(());
         }
+        
+        
+        app.handle_events()?;
     }
 
 }
