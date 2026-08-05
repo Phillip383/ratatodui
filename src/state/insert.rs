@@ -1,5 +1,5 @@
 use crate::types::{
-    ActiveWidget::{EditorTodoDesc, EditorTodoName},
+    ActiveWidget::{EditorTodoDesc, EditorTodoName, EditorListName},
     AppAction,
 };
 
@@ -20,6 +20,7 @@ impl State for InsertMode {
                 match _active_widget {
                     EditorTodoDesc => return Transition::Action(AppAction::InsertChar(c)),
                     EditorTodoName => return Transition::Action(AppAction::InsertChar(c)),
+                    EditorListName => return Transition::Action(AppAction::InsertChar(c)),
                     _ => (),
                 }
             }

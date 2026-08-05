@@ -10,6 +10,7 @@ pub enum ActiveWidget {
     StatusBar,
     EditorTodoName,
     EditorTodoDesc,
+    EditorListName,
 }
 
 pub enum AppAction {

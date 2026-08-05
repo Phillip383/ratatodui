@@ -9,7 +9,7 @@ use crate::{state::{
     Transition::{self, Action, ChangeFocus, ChangeState},
     VimState::{self, Normal, Visual},
     command, normal,
-}};
+}, types::ActiveWidget::EditorListName};
 
 use crate::types::{
     ActiveWidget::{self, EditorTodoDesc, EditorTodoName},
@@ -142,6 +142,11 @@ impl App {
                         }
                     }
                 }
+                EditorListName => {
+                    if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                        active_list.title.push(c);
+                    } 
+                }
                 _ => (),
             },
             CreateList => self.create_list(),
@@ -163,6 +168,11 @@ impl App {
                             active_todo.description.pop();
                         }
                     }
+                }
+                EditorListName => {
+                    if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                        active_list.title.pop();
+                    } 
                 }
                 _ => (),
             },

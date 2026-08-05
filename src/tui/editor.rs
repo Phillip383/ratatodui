@@ -33,7 +33,7 @@ impl Editor {
 impl Component for Editor {
     fn handle_active_state(&mut self, active_widget: &ActiveWidget) {
         
-        self.lists_active = *active_widget == ActiveWidget::Lists;
+        self.lists_active = *active_widget == ActiveWidget::Lists || *active_widget == ActiveWidget::EditorListName;
 
         match active_widget {
             EditorTodoName => {
