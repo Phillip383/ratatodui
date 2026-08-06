@@ -225,29 +225,41 @@ impl App {
                 }
                 _ => (),
             },
-            Save => {
-                let _result = self.save();
-                //TODO:  Save with channel...
-            }
-            Execute => {
-                match self.command_buffer.as_str() {
-                    "q" => self.b_quit = true,
-                    "wa" => {let _ = self.save();},
-                    _ => ()
-                }
-
-                self.command_buffer.clear();
-            }
+            Save => self.save(),
+            Execute => self.exec_command(),
         }
     }
 
-    fn save(&self) -> Result<std::fs::File, ErrReport> {
-        let d = serde_json::to_string_pretty(&self.lists)?;
-        let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json");
-        //Update File Path to be changeable with sensable default in config.
-        let mut file = std::fs::File::create(path)?;
-        file.write_all(d.as_bytes())?;
-        Ok(file)
+    fn save(&mut self) {
+
+        //Don't allow double saves.
+        if self.app_status == AppStatus::Saving {
+            return;
+        }
+        //Set status to saving...
+        self.app_status = AppStatus::Saving;
+        
+        let d = serde_json::to_string_pretty(&self.lists).unwrap_or_default();
+        let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json").clone();
+        let tx = self.save_tx.clone();
+        
+        tokio::spawn(async move {
+            let res = tokio::fs::write(path, d).await;
+            match res {
+                Ok(()) => tx.send(AppStatus::Idle),
+                Err(e) => tx.send(AppStatus::Error(e.to_string())),
+            }
+        });
+    }
+
+    fn exec_command(&mut self) {
+        match self.command_buffer.as_str() {
+            "q" => self.b_quit = true,
+            "wa" => {let _ = self.save();},
+            _ => ()
+        }
+
+        self.command_buffer.clear();
     }
 
     //TODO: Handle id's

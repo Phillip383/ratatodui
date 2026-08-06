@@ -27,6 +27,7 @@ pub enum AppAction {
     Execute,
 }
 
+#[derive(PartialEq)]
 pub enum AppStatus {
     Idle,
     Saving,

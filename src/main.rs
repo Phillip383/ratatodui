@@ -9,7 +9,7 @@ use ratatui::DefaultTerminal;
 use app::App;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
-use crate::app::Config;
+use crate::{app::Config, types::AppStatus};
 
 #[tokio::main]
 async fn main() -> Result<(), ErrReport> {
@@ -35,6 +35,17 @@ pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
 
         if let Ok(lists) = app.init_rx.try_recv() {
             app.lists = lists;
+        }
+
+        if let Ok(save_status) = app.save_rx.try_recv() {
+            match save_status {
+                AppStatus::Idle => app.app_status = save_status,
+                AppStatus::Error(e) => {
+                    eprintln!("{e}");
+                    app.app_status = AppStatus::Idle;
+                },
+                _ => ()
+            }
         }
 
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
