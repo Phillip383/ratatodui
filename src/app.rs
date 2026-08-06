@@ -79,7 +79,9 @@ impl App {
     }
 
     pub fn init(&mut self) {
-        //TODO: Use the async version or start a channel.
+        
+        self.app_status = AppStatus::Loading;
+
         let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json").clone();
         let tx = self.init_tx.clone();
         
@@ -232,8 +234,8 @@ impl App {
 
     fn save(&mut self) {
 
-        //Don't allow double saves.
-        if self.app_status == AppStatus::Saving {
+        //Don't allow double saves, or saves while loading.
+        if self.app_status != AppStatus::Idle {
             return;
         }
         //Set status to saving...

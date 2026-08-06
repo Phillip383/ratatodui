@@ -35,6 +35,7 @@ pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
 
         if let Ok(lists) = app.init_rx.try_recv() {
             app.lists = lists;
+            app.app_status = AppStatus::Idle;
         }
 
         if let Ok(save_status) = app.save_rx.try_recv() {

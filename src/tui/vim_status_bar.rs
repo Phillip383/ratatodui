@@ -27,7 +27,7 @@ impl Component for VimStatusBar {
             _ => self.color = Color::Red,
         };
     }
-
+    //TODO: Add save/load status and Error logging
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
         self.handle_active_state(&app.active_widget);
 
@@ -36,7 +36,7 @@ impl Component for VimStatusBar {
 
         let lo = Layout::default()
             .direction(Horizontal)
-            .constraints([Constraint::Percentage(10), Constraint::Min(0)])
+            .constraints([Constraint::Percentage(10), Constraint::Min(25), Constraint::Min(0)])
             .split(container_inner);
 
         self.state = match &app.current_mode {
@@ -51,8 +51,16 @@ impl Component for VimStatusBar {
         command.set_cursor_render_mode(tui_textarea::CursorRenderMode::Hidden);
         command.set_style(Style::new().fg(self.color));
 
+        let log = match &app.app_status {
+            crate::types::AppStatus::Loading => "Loading...".to_string(),
+            crate::types::AppStatus::Saving => "Saving...".to_string(),
+            crate::types::AppStatus::Error(e) => e.clone(),
+            _ => "".to_string()
+        };
+
         frame.render_widget(container, area);
         frame.render_widget(Paragraph::new(self.state.as_str()), lo[0]);
         frame.render_widget(&command, lo[1]);
+        frame.render_widget(Paragraph::new(log), lo[2]);
     }
 }
