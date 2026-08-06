@@ -33,6 +33,10 @@ pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
 
     loop {
 
+        if let Ok(lists) = app.init_rx.try_recv() {
+            app.lists = lists;
+        }
+
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
         
         if app.b_quit {

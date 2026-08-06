@@ -4,7 +4,7 @@ use app_dirs2::{AppDataType, AppInfo};
 use color_eyre::eyre::{ErrReport, Result};
 use crossterm::event::{self, Event, KeyCode};
 use serde::{Deserialize, Serialize};
-use tokio::sync::mpsc;
+use tokio::{sync::mpsc};
 
 use crate::{state::{
     State,
@@ -45,8 +45,8 @@ pub struct App {
     config: Config,
     pub save_tx: mpsc::UnboundedSender<AppStatus>,
     pub save_rx: mpsc::UnboundedReceiver<AppStatus>,
-    pub init_tx: mpsc::UnboundedSender<AppStatus>,
-    pub init_rx: mpsc::UnboundedReceiver<AppStatus>,
+    pub init_tx: mpsc::UnboundedSender<Vec<TodoList>>,
+    pub init_rx: mpsc::UnboundedReceiver<Vec<TodoList>>,
     pub lists: Vec<TodoList>,
     pub current_mode: VimState,
     pub active_widget: ActiveWidget,
@@ -81,8 +81,13 @@ impl App {
     pub fn init(&mut self) {
         //TODO: Use the async version or start a channel.
         let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json").clone();
-        let data = read_to_string(path).unwrap_or_default().clone();
-        self.lists = serde_json::from_str(data.as_str()).unwrap_or_default();
+        let tx = self.init_tx.clone();
+        
+        tokio::spawn(async move {
+            let data = tokio::fs::read_to_string(path).await.unwrap_or_default();
+            let lists: Vec<TodoList> = serde_json::from_str(data.as_str()).unwrap_or_default();
+            let _ = tx.send(lists);
+        });
 
     }
 
