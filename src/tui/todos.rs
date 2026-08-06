@@ -35,7 +35,7 @@ impl Component for TodoList {
         self.state.select(Some(app.active_todo));
 
         let list_container =
-            super::border_box(self.color, "[T]odos", Some("[C]reate [R]emove [E]dit"));
+            super::border_box(self.color, "[T]odos", Some("[C]reate [R]emove [c]omplete"));
         let list_inner = list_container.inner(area);
 
         let Some(active_list) = app.lists.get(app.active_list_item) else {

@@ -157,6 +157,13 @@ impl App {
                     } 
                     
                 }
+            CompleteTodo => {
+                if let Some(active_list) = self.lists.get_mut(self.active_list_item) {
+                    if let Some(active_todo) = active_list.todos.get_mut(self.active_todo) {
+                        active_todo.completed = !active_todo.completed;
+                    }
+                }
+            }
             InsertChar(c) => match self.active_widget {
                 //TODO: Handle index out of bounds...
                 EditorTodoName => {

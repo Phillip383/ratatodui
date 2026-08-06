@@ -58,6 +58,12 @@ impl State for NormalMode {
                     }
                     _ => (),
                 },
+                'c' => match _active_widget {
+                    ActiveWidget::Todos => {
+                        return Transition::Action(AppAction::CompleteTodo);
+                    },
+                    _ => ()
+                }
                 _ => (),
             }
         }
