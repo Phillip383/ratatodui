@@ -218,8 +218,9 @@ impl App {
                 //TODO:  Save with channel...
             }
             Execute => {
-                if self.command_buffer.eq("q") {
-                    self.b_quit = true;
+                match self.command_buffer.as_str() {
+                    "q" => self.b_quit = true,
+                    _ => self.command_buffer = "Command Not Found.".to_string()
                 }
             }
         }

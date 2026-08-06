@@ -15,6 +15,9 @@ impl State for CommandMode {
             //TODO: Process the command in the command buffer.
             return Transition::Action(AppAction::Execute);
         }
+        if input == KeyCode::Backspace {
+            return Transition::Action(AppAction::Backspace);
+        }
 
         if let Some(c) = input.as_char() {
             return Transition::Action(AppAction::InsertChar(c));
