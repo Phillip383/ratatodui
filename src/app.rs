@@ -227,8 +227,11 @@ impl App {
             Execute => {
                 match self.command_buffer.as_str() {
                     "q" => self.b_quit = true,
-                    _ => self.command_buffer = "Command Not Found.".to_string()
+                    "wa" => {let _ = self.save();},
+                    _ => ()
                 }
+
+                self.command_buffer.clear();
             }
         }
     }
