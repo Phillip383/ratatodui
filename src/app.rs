@@ -255,10 +255,11 @@ impl App {
     }
 
     fn exec_command(&mut self) {
+        self.app_status = AppStatus::Idle; //Reset app status from previous fail.
         match self.command_buffer.as_str() {
             "q" => self.b_quit = true,
             "wa" => {let _ = self.save();},
-            _ => ()
+            _ => self.app_status = AppStatus::Error("Command Not Found".to_string())
         }
 
         self.command_buffer.clear();
