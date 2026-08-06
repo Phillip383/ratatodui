@@ -28,8 +28,8 @@ const APP_INFO: AppInfo = AppInfo {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    version: String,
-    save_dir: PathBuf
+    pub version: String,
+    pub save_dir: PathBuf
 }
 
 impl Default for Config {

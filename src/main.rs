@@ -2,6 +2,7 @@ mod app;
 mod state;
 mod tui;
 mod types;
+mod cli;
 
 use color_eyre::eyre::{ErrReport, Result};
 use ratatui::DefaultTerminal;
@@ -14,12 +15,19 @@ use crate::{app::Config, types::AppStatus};
 #[tokio::main]
 async fn main() -> Result<(), ErrReport> {
     color_eyre::install()?;
-    
-    
-    enable_raw_mode()?;
-    ratatui::run(|t| run(t))?;
-    ratatui::restore();
-    disable_raw_mode()?;
+
+    let args = std::env::args();
+    if args.len() > 1 {
+        //process command
+        let config: Config = confy::load("Ratatodui", None)?;
+        cli::run(config).await?;
+
+    } else {    
+        enable_raw_mode()?;
+        ratatui::run(|t| run(t))?;
+        ratatui::restore();
+        disable_raw_mode()?;
+    }
      
     Ok(())
 }
