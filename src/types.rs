@@ -6,7 +6,6 @@ use ratatui::widgets::ListItem;
 pub enum ActiveWidget {
     Todos,
     Lists,
-    Editor,
     StatusBar,
     EditorTodoName,
     EditorTodoDesc,
@@ -32,7 +31,6 @@ pub enum AppStatus {
     Idle,
     Saving,
     Loading,
-    Success,
     Error(String),
 }
 

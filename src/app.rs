@@ -1,4 +1,4 @@
-use std::{fs::read_to_string, io::Write, path::PathBuf, time::Duration};
+use std::{path::PathBuf, time::Duration};
 use app_dirs2::{AppDataType, AppInfo};
 
 use color_eyre::eyre::{ErrReport, Result};
