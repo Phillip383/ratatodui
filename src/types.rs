@@ -23,12 +23,13 @@ pub enum AppAction {
     DeleteTodo,
     Save,
     Backspace,
-    Quit,
+    Execute,
 }
 
-pub enum SaveStatus {
+pub enum AppStatus {
     Idle,
     Saving,
+    Loading,
     Success,
     Error(String),
 }

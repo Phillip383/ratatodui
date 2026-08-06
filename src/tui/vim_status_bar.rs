@@ -2,11 +2,9 @@ use crate::types::ActiveWidget;
 
 use super::{Component, app};
 use ratatui::{
-    Frame,
-    layout::{Constraint, Direction::Horizontal, Layout, Rect},
-    style::Color,
-    widgets::{Block, Padding, Paragraph},
+    Frame, layout::{Constraint, Direction::Horizontal, Layout, Rect}, style::{Color, Style}, widgets::{Block, Padding, Paragraph},
 };
+use tui_textarea::TextArea;
 
 pub struct VimStatusBar {
     state: String,
@@ -48,8 +46,13 @@ impl Component for VimStatusBar {
             crate::state::VimState::Visual(_mode) => "VISUAL".to_string(),
         };
 
+        let mut command = TextArea::default();
+        command.insert_str(&app.command_buffer);
+        command.set_cursor_render_mode(tui_textarea::CursorRenderMode::Hidden);
+        command.set_style(Style::new().fg(self.color));
+
         frame.render_widget(container, area);
         frame.render_widget(Paragraph::new(self.state.as_str()), lo[0]);
-        frame.render_widget(Paragraph::new("..."), lo[1]);
+        frame.render_widget(&command, lo[1]);
     }
 }

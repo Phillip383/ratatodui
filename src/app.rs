@@ -11,14 +11,14 @@ use crate::{state::{
     Transition::{self, Action, ChangeFocus, ChangeState},
     VimState::{self, Normal, Visual},
     command, normal,
-}, types::ActiveWidget::EditorListName};
+}, types::ActiveWidget::{EditorListName, StatusBar}};
 
 use crate::types::{
     ActiveWidget::{self, EditorTodoDesc, EditorTodoName},
     AppAction::{self, *},
     Todo,
     TodoList,
-    SaveStatus,
+    AppStatus,
 };
 
 const APP_INFO: AppInfo = AppInfo {
@@ -43,39 +43,46 @@ impl Default for Config {
 
 pub struct App {
     config: Config,
-    pub save_tx: mpsc::UnboundedSender<Result<(), String>>,
-    pub save_rx: mpsc::UnboundedReceiver<Result<(), String>>,
+    pub save_tx: mpsc::UnboundedSender<AppStatus>,
+    pub save_rx: mpsc::UnboundedReceiver<AppStatus>,
+    pub init_tx: mpsc::UnboundedSender<AppStatus>,
+    pub init_rx: mpsc::UnboundedReceiver<AppStatus>,
     pub lists: Vec<TodoList>,
     pub current_mode: VimState,
     pub active_widget: ActiveWidget,
     pub active_list_item: usize,
     pub active_todo: usize,
     pub b_quit: bool,
-    pub save_status: SaveStatus,
+    pub app_status: AppStatus,
+    pub command_buffer: String,
 }
 
 impl App {
     pub fn new(config: Config) -> Self {
         let (save_tx, save_rx) = mpsc::unbounded_channel();
+        let (init_tx, init_rx) = mpsc::unbounded_channel();
         App {
             config,
             save_rx,
             save_tx,
+            init_tx,
+            init_rx,
             lists: Vec::new(),
             current_mode: VimState::Normal(normal::NormalMode),
             active_widget: ActiveWidget::Todos,
             active_list_item: 0,
             active_todo: 0,
             b_quit: false,
-            save_status: SaveStatus::Idle
+            app_status: AppStatus::Idle,
+            command_buffer: String::new(),
         }
     }
 
     pub fn init(&mut self) {
         //TODO: Use the async version or start a channel.
-        let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json");
-        let data = read_to_string(path).unwrap(); //TODO: Remove the unwrap, it'll crash.
-        self.lists = serde_json::from_str(data.as_str()).unwrap();
+        let path = format!("{}/{}", &self.config.save_dir.to_string_lossy(), "lists.json").clone();
+        let data = read_to_string(path).unwrap_or_default().clone();
+        self.lists = serde_json::from_str(data.as_str()).unwrap_or_default();
 
     }
 
@@ -171,6 +178,9 @@ impl App {
                         active_list.title.push(c);
                     } 
                 }
+                StatusBar => {
+                    self.command_buffer.push(c);
+                }
                 _ => (),
             },
             CreateList => self.create_list(),
@@ -198,14 +208,20 @@ impl App {
                         active_list.title.pop();
                     } 
                 }
+                StatusBar => {
+                    self.command_buffer.pop();
+                }
                 _ => (),
             },
             Save => {
                 let _result = self.save();
                 //TODO:  Save with channel...
-                println!("{:?}", _result);
             }
-            Quit => self.b_quit = true,
+            Execute => {
+                if self.command_buffer.eq("q") {
+                    self.b_quit = true;
+                }
+            }
         }
     }
 

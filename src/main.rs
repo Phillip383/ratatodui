@@ -33,14 +33,6 @@ pub fn run(terminal: &mut DefaultTerminal) -> Result<(), ErrReport> {
 
     loop {
 
-        
-        if let Ok(result) = app.save_rx.try_recv() {
-            match result {
-                Ok(_) => app.save_status = types::SaveStatus::Success,
-                Err(msg) => app.save_status = types::SaveStatus::Error(msg)
-            }
-        }
-
         terminal.draw(|frame| tui::render(frame, &mut tui, &app))?;
         
         if app.b_quit {
