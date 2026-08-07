@@ -57,7 +57,7 @@ impl Component for Editor {
     fn render(&mut self, frame: &mut Frame, area: Rect, app: &app::App) {
         self.handle_active_state(&app.active_widget);
 
-        let editor_block = super::border_box(Color::Red, "Ratatodui", Some("[S]ave [C]ancel"));
+        let editor_block = super::border_box(Color::Red, "Ratatodui", Some("[S]ave"));
         let editor_inner = editor_block.inner(area);
 
         let editor_layout = Layout::default()

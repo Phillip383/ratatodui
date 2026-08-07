@@ -252,7 +252,9 @@ async fn print(config: Config) {
         for list in lists {
             let mut item = Tree::new(list.title);
             for todo in list.todos {
-                item.push(todo.title);
+                let checkbox = if todo.completed {"[X]"} else {"[ ]"};
+                let text = format!("{} {}", checkbox, todo.title);
+                item.push(text);
             }
 
             root.push(item);
