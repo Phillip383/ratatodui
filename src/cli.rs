@@ -16,8 +16,8 @@ pub async fn run(config: Config) -> Result<(), ErrReport> {
         Commands::Ul(args) => update_list(config, args.list,args.name).await,
         Commands::Ut(args) => update_todo(config, args.list, args.name, args.new_name, args.desc, args.complete).await,
         Commands::C(args) => update_todo(config, args.list, args.name, None, None, Some(true)).await,
+        Commands::Rl(args) => remove_list(config, &args.name).await,
         _ => (),
-        // Commands::Rl(args) => remove_list(config, &args.name),
         // Commands::Rt(args) => remove_todo(config, &args.list, &args.name),
     } 
 
@@ -36,7 +36,7 @@ enum Commands {
     Nl(NewListArgs),
     ///Creates a new todo with a given list
     Nt(NewTodoArgs),
-    ///Removes a list
+    ///Removes all lists with given name
     Rl(RemoveListArgs),
     ///Removes a todo from a given list
     Rt(RemoveTodoArgs),
@@ -208,10 +208,9 @@ async fn update_list(config: Config, list_name: String, new_name: String) {
 
 async fn remove_list(config: Config, name: &str) {
     if let Some(lists) = get_lists(&config).await {
-
+       let lists: Vec<TodoList> = lists.into_iter().filter(|l| l.title != name).collect();
+       let res = write_lists(config, &lists).await;
     }
-    
-    println!("Executing: {}", name);
 }
 
 async fn update_todo(config: Config, list_name: String, name: String, new_name: Option<String>, desc: Option<String>, complete: Option<bool>) {
