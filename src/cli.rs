@@ -1,5 +1,3 @@
-use std::io::{Error, Write};
-
 use color_eyre::eyre::{ErrReport, Result};
 use clap::{Args, Parser, Subcommand};
 use tokio::fs::read_to_string;
@@ -15,10 +13,10 @@ pub async fn run(config: Config) -> Result<(), ErrReport> {
     match cli.command {
         Commands::Nl(args) => create_list(config, &args.name).await,
         Commands::Nt(args) => create_todo( config, &args.list, &args.name, args.desc).await,
+        Commands::Ul(args) => update_list(config, args.list,args.name).await,
         _ => (),
         // Commands::Rl(args) => remove_list(config, &args.name),
         // Commands::Rt(args) => remove_todo(config, &args.list, &args.name),
-        // Commands::Ul(args) => update_list(config, &args.name),
         // Commands::Ut(args) => update_todo(config, args.list, args.name, args.new_name, args.desc, args.complete),
         // Commands::C(args) => update_todo(config, args.list, args.name, None, None, Some(true)),
     } 
@@ -87,6 +85,10 @@ struct RemoveTodoArgs {
 
 #[derive(Args)]
 struct UpdateListArgs {
+    
+    #[arg(long="list", required=true)]
+    list: String,
+    
     #[arg(long="name", required=true)]
     name: String,  
 }
@@ -171,8 +173,17 @@ async fn create_todo(config: Config, list_name: &str, name: &str, desc: Option<S
     }
 }
 
-fn update_list(config: Config, name: &str) {
-    println!("Executing: {}", name);
+async fn update_list(config: Config, list_name: String, new_name: String) {
+    if let Some(lists) = &mut get_lists(&config).await {
+        for list in &mut *lists {
+            if list.title == list_name {
+                list.title = new_name;
+                break;
+            }
+        }
+
+        let res = write_lists(config, &lists).await;
+    }
 }
 
 fn remove_list(config: Config, name: &str) {
