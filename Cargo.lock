@@ -2473,6 +2473,7 @@ dependencies = [
  "rprompt",
  "serde",
  "serde_json",
+ "termtree",
  "tokio",
  "tui-textarea-2",
 ]
@@ -3111,6 +3112,12 @@ checksum = "411c5bf740737c7918b8b1fe232dca4dc9f8e754b8ad5e20966814001ed0ac6b"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "termtree"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4d1330fe7f7f872cd05165130b10602d667b205fd85be09be2814b115d4ced9"
 
 [[package]]
 name = "termwiz"

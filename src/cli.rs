@@ -1,7 +1,7 @@
 use color_eyre::eyre::{ErrReport, Result};
-use clap::{Args, Command, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use tokio::fs::read_to_string;
-
+use termtree::Tree;
 use crate::app::Config;
 use crate::types::{Todo, TodoList};
 
@@ -246,14 +246,20 @@ async fn remove_todo(config: Config, list_name: &str, name: &str) {
 }
 
 async fn print(config: Config) {
+    let mut root = Tree::new("To-Do List's".to_string());
+
     if let Some(lists) = get_lists(&config).await {
         for list in lists {
-            println!("{}", list.title);
+            let mut item = Tree::new(list.title);
             for todo in list.todos {
-                println!("  {}", todo.title);
+                item.push(todo.title);
             }
+
+            root.push(item);
         }
     }
+
+    println!{"{root}"};
 }
 
 #[cfg(test)]
