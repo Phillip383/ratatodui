@@ -1,5 +1,5 @@
 use color_eyre::eyre::{ErrReport, Result};
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Command, Parser, Subcommand};
 use tokio::fs::read_to_string;
 
 use crate::app::Config;
@@ -17,8 +17,8 @@ pub async fn run(config: Config) -> Result<(), ErrReport> {
         Commands::Ut(args) => update_todo(config, args.list, args.name, args.new_name, args.desc, args.complete).await,
         Commands::C(args) => update_todo(config, args.list, args.name, None, None, Some(true)).await,
         Commands::Rl(args) => remove_list(config, &args.name).await,
-        _ => (),
-        // Commands::Rt(args) => remove_todo(config, &args.list, &args.name),
+        Commands::Rt(args) => remove_todo(config, &args.list, &args.name).await,
+        Commands::Print => print(config).await,
     } 
 
     Ok(())
@@ -38,7 +38,7 @@ enum Commands {
     Nt(NewTodoArgs),
     ///Removes all lists with given name
     Rl(RemoveListArgs),
-    ///Removes a todo from a given list
+    ///Removes all todos from a given list that matches the todo name
     Rt(RemoveTodoArgs),
     ///Complete a given todo
     C(CompleteArgs),
@@ -46,6 +46,7 @@ enum Commands {
     Ul(UpdateListArgs),
     ///Update a given todo's name, desc, or complete status
     Ut(UpdateTodoArgs),
+    Print,
 }
 
 #[derive(Args)]
@@ -82,10 +83,10 @@ struct RemoveListArgs {
 
 #[derive(Args)]
 struct RemoveTodoArgs {
-    #[arg(long="list", required= true)]
+    #[arg(short='l', long="list", required= true)]
     list: String,
 
-    #[arg(long="name", required=true)]
+    #[arg(short='t', long="name", required=true)]
     name: String, 
 }
 
@@ -232,8 +233,27 @@ async fn update_todo(config: Config, list_name: String, name: String, new_name: 
     }
 }
 
-fn remove_todo(config: Config, list_name: &str, name: &str) {
-    println!("Executing: {}", name);
+async fn remove_todo(config: Config, list_name: &str, name: &str) {
+    if let Some(mut lists) = get_lists(&config).await {
+        for list in lists.iter_mut() {
+            if list.title == list_name {
+                list.todos.retain(|t| t.title != name);
+            }
+        }
+        let res = write_lists(config, &lists).await;
+    }
+
+}
+
+async fn print(config: Config) {
+    if let Some(lists) = get_lists(&config).await {
+        for list in lists {
+            println!("{}", list.title);
+            for todo in list.todos {
+                println!("  {}", todo.title);
+            }
+        }
+    }
 }
 
 #[cfg(test)]
