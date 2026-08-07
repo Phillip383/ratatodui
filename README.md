@@ -1,15 +1,32 @@
-# Introduction
-Ratodoui is a TUI Todo application built with Rust using the Ratatui Framework. Vim like keybindings for traversing the applications different widgets. There is also a command line interface to interact with todo lists and todo's.
+# Ratatodui
 
-![](https://github.com/Phillip383/ratatodui/blob/main/docs/media/ratatodui.gif)
+**Ratatodui** is a terminal-based To-Do application built with Rust and the [Ratatui](https://ratatui.rs) framework. It features Vim-like keybindings for seamless navigation across widgets, alongside a fast CLI interface for quick task management and scripting.
 
-# Using the CLI
+![Ratatodui TUI Demo](docs/media/ratatodui.gif)
 
-The CLI was built using the clap crate, which greatly reduces the friction in building a comprehensive and robust interface with usage tips and required options for subcommands.
-Commands exist for creating, deleting and updating lists and todo's.
-The print command will print a formatted tree structure of all the lists and their todo's with completion status.
+---
 
-![](https://github.com/Phillip383/ratatodui/blob/main/docs/media/cli_demo.png)
+## Features & Usage
 
-# Building from Source
-Rust should be the only prereq required other than cloning the source code. From the root directory run `cargo build`.
+### Interactive TUI Mode
+Launch the full interactive terminal application by running `ratatodui` with no subcommands. Use Vim-style keybindings (`h`, `j`, `k`, `l`) to navigate through lists and manage your tasks.
+
+### Command Line Interface (CLI)
+Built using `clap` for robust argument validation and auto-generated help menus, the CLI allows you to create, update, and delete lists or individual to-dos directly from your shell.
+
+* **Tree Formatting:** The `print` subcommand renders your entire to-do hierarchy using a tree structure complete with completion status markers:
+
+![Ratatodui CLI Demo](docs/media/cli_demo.png)
+
+---
+
+## Building from Source
+
+### Prerequisites
+* [Rust toolchain](https://www.rust-lang.org/tools/install) (`cargo`, `rustc`)
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/Phillip383/ratatodui.git](https://github.com/Phillip383/ratatodui.git)
+   cd ratatodui
