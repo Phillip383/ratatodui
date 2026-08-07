@@ -9,5 +9,7 @@ The CLI was built using the clap crate, which greatly reduces the friction in bu
 Commands exist for creating, deleting and updating lists and todo's.
 The print command will print a formatted tree structure of all the lists and their todo's with completion status.
 
+![](https://github.com/Phillip383/ratatodui/blob/main/docs/media/cli_demo.png)
+
 # Building from Source
 Rust should be the only prereq required other than cloning the source code. From the root directory run `cargo build`.
