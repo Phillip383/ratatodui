@@ -14,11 +14,11 @@ pub async fn run(config: Config) -> Result<(), ErrReport> {
         Commands::Nl(args) => create_list(config, &args.name).await,
         Commands::Nt(args) => create_todo( config, &args.list, &args.name, args.desc).await,
         Commands::Ul(args) => update_list(config, args.list,args.name).await,
+        Commands::Ut(args) => update_todo(config, args.list, args.name, args.new_name, args.desc, args.complete).await,
+        Commands::C(args) => update_todo(config, args.list, args.name, None, None, Some(true)).await,
         _ => (),
         // Commands::Rl(args) => remove_list(config, &args.name),
         // Commands::Rt(args) => remove_todo(config, &args.list, &args.name),
-        // Commands::Ut(args) => update_todo(config, args.list, args.name, args.new_name, args.desc, args.complete),
-        // Commands::C(args) => update_todo(config, args.list, args.name, None, None, Some(true)),
     } 
 
     Ok(())
@@ -32,18 +32,24 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    ///Creates a new list
     Nl(NewListArgs),
+    ///Creates a new todo with a given list
     Nt(NewTodoArgs),
+    ///Removes a list
     Rl(RemoveListArgs),
+    ///Removes a todo from a given list
     Rt(RemoveTodoArgs),
+    ///Complete a given todo
     C(CompleteArgs),
+    ///Update list name
     Ul(UpdateListArgs),
+    ///Update a given todo's name, desc, or complete status
     Ut(UpdateTodoArgs),
 }
 
 #[derive(Args)]
 struct NewListArgs {
-
     #[arg(long="name", required=true)]
     name: String
 }
@@ -64,7 +70,7 @@ struct CompleteArgs {
     #[arg(short='l', long="list", required=true)]
     list: String,
 
-    #[arg(long="name", required=true)]
+    #[arg(short='n', long="name", required=true)]
     name: String,
 }
 
@@ -95,16 +101,17 @@ struct UpdateListArgs {
 
 #[derive(Args)]
 struct UpdateTodoArgs {
-    #[arg(long="list", required= true)]
+    #[arg(short='l', long="list_name", required= true)]
     list: String,
     
-    #[arg(long="name", required=true)]
+    #[arg(short='t', long="todo_name", required=true)]
     name: String,
 
+    #[arg(short='n', long="new_name", required=false)]
     new_name: Option<String>,
-
+    #[arg(short='d', long="desc", required=false)]
     desc: Option<String>,
-
+    #[arg(short='c', long="complete", required=false)]
     complete: Option<bool>,
 
 }
@@ -128,6 +135,19 @@ async fn write_lists(config: Config, lists: &Vec<TodoList>) -> Result<(), tokio:
     let data = serde_json::to_string_pretty(&lists).unwrap();
     tokio::fs::write(path, data.as_bytes()).await
 
+}
+
+async fn get_todo(lists: &mut Vec<TodoList>, list_name: String, todo_name: String) -> Option<&mut Todo> {
+    for list in lists {
+        if list.title == list_name {
+            for todo in &mut list.todos {
+                if todo.title == todo_name {
+                    return Some(todo);
+                }
+            }
+        }
+    }
+    None
 }
 
 async fn create_list(config: Config, name: &str) {
@@ -186,12 +206,31 @@ async fn update_list(config: Config, list_name: String, new_name: String) {
     }
 }
 
-fn remove_list(config: Config, name: &str) {
+async fn remove_list(config: Config, name: &str) {
+    if let Some(lists) = get_lists(&config).await {
+
+    }
+    
     println!("Executing: {}", name);
 }
 
-fn update_todo(config: Config, list_name: String, name: String, new_name: Option<String>, desc: Option<String>, complete: Option<bool>) {
-        println!("Executing: {}", name);
+async fn update_todo(config: Config, list_name: String, name: String, new_name: Option<String>, desc: Option<String>, complete: Option<bool>) {
+    if let Some(lists) = &mut get_lists(&config).await {
+
+        if let Some(todo) = get_todo(lists, list_name, name).await {
+            if let Some(new_name) = new_name {
+                todo.title = new_name;
+            }
+            if let Some(desc) = desc {
+                todo.description = desc;
+            }
+            if let Some(complete) = complete {
+                todo.completed = complete;
+            }
+        }
+
+        let res = write_lists(config, lists).await;
+    }
 }
 
 fn remove_todo(config: Config, list_name: &str, name: &str) {
